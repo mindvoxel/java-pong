@@ -201,10 +201,6 @@ public class Game extends JFrame implements Runnable {
 	}
 	
 	public void doCollision(){
-		//print the position of the left paddle and the ball
-		//System.out.println(p1 + " x: " + p1.getxPos() + " y: " + p1.getyPos());
-		//System.out.println(b + " x: " +  b.getxPos() + " y: " +  b.getyPos());
-		
 		//left paddle collision
 		for (int colY =  p1.getyPos(); colY <  p1.getyPos() + PADDLE_HEIGHT; colY++){
 			if (  b.getxPos() ==  p1.getxPos() &&   b.getyPos() + BALL_RADIUS == colY){
