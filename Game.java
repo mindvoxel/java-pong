@@ -220,8 +220,6 @@ public class Game extends JFrame implements Runnable {
 				b.setYVelocity(p1.getVelocity());
 			}
 		}	
-		
-		
 	}
 	
 	public void gameOver(){
