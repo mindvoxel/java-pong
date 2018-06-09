@@ -57,8 +57,6 @@ public class Game extends JFrame implements Runnable {
 		//set up the double buffer
 		myBuff = new BufferedImage(GAME_HEIGHT, GAME_WIDTH, BufferedImage.TYPE_INT_RGB); 
 		
-		
-
 		//sets up the canvas which is a subclass of component
 		Canvas myCanvas = new Canvas();
 		myCanvas.setFocusable(true);
@@ -99,12 +97,11 @@ public class Game extends JFrame implements Runnable {
 		//random object for creating a ball in a random position 
 		ballRand = new Random();
 
-                /*Instantiate all of the game objects, once*/
+                /*instantiate all of the game objects, once*/
 		p1 = new PlayerPaddle(25, GAME_HEIGHT / 2);
 		p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
 		b = new Ball(GAME_WIDTH/2, ballRand.nextInt(150) + 150,  (ballRand.nextInt(120) + 120) * (Math.PI / 180.0));
 		
-
 		while (running){
 			updateInput(); //if put inside the try then there is a chance user input won't be polled
 			try {
@@ -131,10 +128,11 @@ public class Game extends JFrame implements Runnable {
 			//if the thread is interrupted
 			catch (InterruptedException ex){
 				ex.printStackTrace();
-			}
-
+			//handle all exceptions
+			}catch (Exception ex){
+				ex.printStackTrace();
+			}//end catch
 		} //end while
-
 	} //end run
 	
 	//polls the player input
@@ -285,9 +283,6 @@ public class Game extends JFrame implements Runnable {
 			
 			//draw the back buffer to the screen
 			g2.drawImage(myBuff, 0, 0, this); 
-
 		}
-
 	}
-
-}
+}//end Game class
