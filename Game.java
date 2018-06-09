@@ -169,18 +169,20 @@ public class Game extends JFrame implements Runnable {
 			b = new Ball(GAME_WIDTH/2, ballRand.nextInt(120) + 120,  (ballRand.nextInt(120) + 120 ) * (Math.PI / 180.0));
 		}
 	}
-	
-	public void doP2Behavior(){
-		System.out.println("ball y:" + b.getyPos() +  "paddle y: " + p2.getyPos());
-		if(b.getyPos() > p2.getyPos()){
-			//System.out.println("AI UP");
-			p2.moveDown();
-		} else if (b.getyPos() < p2.getyPos()) {
-			//System.out.println("AI DOWN");
-			p2.moveUp();
-		} else if (b.getyPos() == p2.getyPos()) {
-			//System.out.println("AI STOP");
-			p2.stop();
+
+    public void doP2Behavior() {
+        System.out.println("ball y:" + b.getyPos() + "paddle y: " + p2.getyPos());
+		if (p2.getxPos() - b.getxPos() < 150) { // delays the AI reaction time
+			if (b.getyPos() > p2.getyPos()) {
+				// System.out.println("AI UP");
+				p2.moveDown();
+			} else if (b.getyPos() < p2.getyPos()) {
+				// System.out.println("AI DOWN");
+				p2.moveUp();
+			} else if (b.getyPos() == p2.getyPos()) {
+				// System.out.println("AI STOP");
+				p2.stop();
+			}
 		}
 	}
 	
