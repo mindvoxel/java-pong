@@ -49,10 +49,10 @@ public class Game extends JFrame implements Runnable {
 		//want the game to start running
 		running = true;
 		
-		//set up sound files
-		 miss = new File("miss.wav");
-		 paddle_hit = new File("paddle_hit.wav");
-		 wall_hit = new File("wall_hit.wav");
+		//set up sound files (. can be used to specify the relative path)
+		 miss = new File("./sounds/miss.wav");
+		 paddle_hit = new File("./sounds/paddle_hit.wav");
+		 wall_hit = new File("./sounds/wall_hit.wav");
 		
 		//set up the double buffer
 		myBuff = new BufferedImage(GAME_HEIGHT, GAME_WIDTH, BufferedImage.TYPE_INT_RGB); 
