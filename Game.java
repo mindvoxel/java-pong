@@ -5,10 +5,12 @@ import java.awt.*;
 import java.util.Random; //random number generator
 import java.awt.image.BufferedImage; // for double buffering
 import java.awt.event.KeyEvent; //includes all of the constants used for input
-import java.io.File; //for loading .wav files
+import java.io.File; //for loading .wav files. Dependant on the current working directory. ie. what happens when pwd is typed in a shell. 
 import javax.sound.sampled.AudioSystem; //for playing sounds
 import javax.sound.sampled.Clip; //for playing sounds
 
+/*Implements the Runnable interface, so Game will be treated as a Thread to be executed
+Included in java.lang*/
 public class Game extends JFrame implements Runnable {
 
 	//constants
@@ -19,19 +21,20 @@ public class Game extends JFrame implements Runnable {
 	public static final int BALL_RADIUS = 10; //size of the Ball
 	
 	//static vars
-	public static int LEFT_SCORE = 0;
-	public static int RIGHT_SCORE = 0;
+	public static int left_score = 0;
+	public static int right_score = 0;
 	
 	//instance variables
 	private boolean running; //controlling whether or not the game is running
 	private BufferedImage myBuff; //for making the game double buffered
 	private PlayerPaddle p1; //player paddle
 	private PlayerPaddle p2; //enemy paddle
-	private Ball b; //ball 
+	private Ball b;  
+        private Random ballRand; //for random number generator 
 	private Input gameInput; //instance variable for handling input
 	boolean gameOver = false;
 	
-	//file instance variables
+	//file instance variables (sounds -- all graphics are rendered with Java)
 	private File miss;
 	private File paddle_hit;
 	private File wall_hit;
@@ -54,8 +57,7 @@ public class Game extends JFrame implements Runnable {
 		//set up the double buffer
 		myBuff = new BufferedImage(GAME_HEIGHT, GAME_WIDTH, BufferedImage.TYPE_INT_RGB); 
 		
-		//random object for doing random ball stuff
-		Random ballSeed = new Random();
+		
 
 		//sets up the canvas which is a subclass of component
 		Canvas myCanvas = new Canvas();
@@ -72,15 +74,12 @@ public class Game extends JFrame implements Runnable {
 		add(myCanvas);
 		gameInput = new Input(this); //register input to the jFrame, which is polled
 		
-		//makes the game start running
+		//set the game start running
 		Thread gameThread = new Thread(this);
-		
+	
+		//actually run the game 	
 		gameThread.start();
-		p1 = new PlayerPaddle(25, GAME_HEIGHT / 2);
-		p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
-		b = new Ball(GAME_WIDTH/2, ballSeed.nextInt(150) + 150,  (ballSeed.nextInt(120) + 120) * (Math.PI / 180.0));
-		
-		
+				
 	} //end constructor, game init. 
 	
 	//for playing sound files
@@ -97,6 +96,15 @@ public class Game extends JFrame implements Runnable {
 	//main game loop
 	//this is run when the Thread.start() is run
 	public void run(){
+		//random object for creating a ball in a random position 
+		ballRand = new Random();
+
+                /*Instantiate all of the game objects, once*/
+		p1 = new PlayerPaddle(25, GAME_HEIGHT / 2);
+		p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
+		b = new Ball(GAME_WIDTH/2, ballRand.nextInt(150) + 150,  (ballRand.nextInt(120) + 120) * (Math.PI / 180.0));
+		
+
 		while (running){
 			updateInput(); //if put inside the try then there is a chance user input won't be polled
 			try {
@@ -143,8 +151,8 @@ public class Game extends JFrame implements Runnable {
 		}
 		
 		if (gameOver && gameInput.isKeyDown(KeyEvent.VK_ENTER)){
-			LEFT_SCORE =0;
-			RIGHT_SCORE =0;
+			left_score =0;
+			right_score =0;
 			gameOver = false;
 			p1 = new PlayerPaddle(25, GAME_HEIGHT / 2);
 			p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
@@ -154,11 +162,11 @@ public class Game extends JFrame implements Runnable {
 	//points the ball to null if it goes behind
 	//either of the paddles
 	public void destroyBall(){
-		Random ballSeed = new Random();
+		Random ballRand = new Random();
 		if (b.isDestroyable()){
 			playSound(miss);
 			b = null;
-			b = new Ball(GAME_WIDTH/2, ballSeed.nextInt(120) + 120,  (ballSeed.nextInt(120) + 120 ) * (Math.PI / 180.0));
+			b = new Ball(GAME_WIDTH/2, ballRand.nextInt(120) + 120,  (ballRand.nextInt(120) + 120 ) * (Math.PI / 180.0));
 		}
 	}
 	
@@ -188,14 +196,16 @@ public class Game extends JFrame implements Runnable {
 		if (b.getxPos() == GAME_WIDTH -(4 * Game.BALL_RADIUS)){
 			playSound(wall_hit);
 			if (gameOver == false){
-				LEFT_SCORE++;
+			    //Not a constant variable, so shouldn't be capitalized.
+				left_score++; 
 			}
 		}
 		
 		if (b.getxPos() == 0){
 			playSound(wall_hit);
 			if (gameOver == false){
-				RIGHT_SCORE++;
+			    //Not a constant variable, so shouldn't be capitalized. 
+				right_score++;
 			}
 		}
 	}
@@ -223,7 +233,7 @@ public class Game extends JFrame implements Runnable {
 	}
 	
 	public void gameOver(){
-			if((LEFT_SCORE >= 7 || RIGHT_SCORE >= 7) &&  gameOver == false){
+			if((left_score >= 7 || right_score >= 7) &&  gameOver == false){
 				gameOver = true;
 				p1 = null;
 				p2 = null;
@@ -249,8 +259,8 @@ public class Game extends JFrame implements Runnable {
 				g2.drawLine(GAME_WIDTH/2,i,GAME_WIDTH/2,i +5);
 			}
 			g2.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 72));
-			g2.drawString("" + LEFT_SCORE, GAME_WIDTH/2 -150, 100);
-			g2.drawString("" + RIGHT_SCORE, GAME_WIDTH/2 + 100, 100);
+			g2.drawString("" + left_score, GAME_WIDTH/2 -150, 100);
+			g2.drawString("" + right_score, GAME_WIDTH/2 + 100, 100);
 			
 			//double buffering
 			Graphics2D back_buffer_drawer = (Graphics2D) myBuff.getGraphics(); 
@@ -268,8 +278,8 @@ public class Game extends JFrame implements Runnable {
 				back_buffer_drawer.drawLine(GAME_WIDTH/2,i,GAME_WIDTH/2,i +5);
 			}
 			back_buffer_drawer.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 72));
-			back_buffer_drawer.drawString("" + LEFT_SCORE, GAME_WIDTH/2 - 150, 100);
-			back_buffer_drawer.drawString("" + RIGHT_SCORE, GAME_WIDTH/2 + 100, 100);
+			back_buffer_drawer.drawString("" + left_score, GAME_WIDTH/2 - 150, 100);
+			back_buffer_drawer.drawString("" + right_score, GAME_WIDTH/2 + 100, 100);
 			
 			//draw the back buffer to the screen
 			g2.drawImage(myBuff, 0, 0, this); 
