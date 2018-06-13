@@ -1,5 +1,3 @@
-# java-pong
-This is a pong clone that I created with the Java 9 API. The AI is rather simplistic. Props if you can find a way to beat it.
-
-
-
+java-pong 
+======
+java-pong is a table tennis game built with the Java 9 API. The user plays against a simple AI and the winner is the player who first scores seven points. 
