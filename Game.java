@@ -8,6 +8,8 @@ import java.awt.event.KeyEvent; //includes all of the constants used for input
 import java.io.File; //for loading .wav files. Dependant on the current working directory. ie. what happens when pwd is typed in a shell.
 import javax.sound.sampled.AudioSystem; //for playing sounds
 import javax.sound.sampled.Clip; //for playing sounds
+import javax.sound.sampled.LineUnavailableException; //audio exception
+
 
 /*Implements the Runnable interface, so Game will be treated as a Thread to be executed
 Included in java.lang*/
@@ -67,13 +69,22 @@ public class Game extends JFrame implements Runnable {
 		setVisible(true);
 		setSize(GAME_HEIGHT, GAME_WIDTH);
 		setVisible(true);
-		setResizable(false);
+		//if the window is not resizeable the game does not run on certain linux machines
+		setResizable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		add(myCanvas);
 		gameInput = new Input(this); //register input to the jFrame, which is polled
 
 		//set the game start running
 		Thread gameThread = new Thread(this);
+		
+		try{
+			//waits for this current thread to die before beginning execution		
+			gameThread.join();
+		//most exceptions are contained in java.lang
+		}catch(InterruptedException ex){
+			ex.printStackTrace();
+		}
 
 		//actually run the game
 		gameThread.start();
@@ -86,9 +97,11 @@ public class Game extends JFrame implements Runnable {
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(sound));
 			clip.start();
+		//if the audio clips compete for resources
+		}catch(LineUnavailableException ex){
+			System.out.println("handled strange audio exception");
 		}catch(Exception ex){
-			ex.printStackTrace(); //backtrace
-			System.out.println("PROBLEM WITH THE CLIP");
+			System.out.println("general clip problem");
 		}
 	}
 
@@ -104,7 +117,7 @@ public class Game extends JFrame implements Runnable {
 		b = new Ball(GAME_WIDTH/2, ballRand.nextInt(150) + 150,  (ballRand.nextInt(120) + 120) * (Math.PI / 180.0));
 
 		while (running){
-			updateInput(); //if put inside the try then there is a chance user input won't be polled
+				updateInput(); //if put inside the try then there is a chance user input won't be polled
 			try {
 				if (gameOver == false){
 					Thread.sleep(5);//tells the game how often to refresh
@@ -117,6 +130,8 @@ public class Game extends JFrame implements Runnable {
 					checkWallBounce(); //for playing the wall sounds
 					gameOver();
 					repaint(); // repaint component (draw event in gamemaker)
+					//setResizable(false);while the game is running, the window should not change size for gameplay purposes
+
 				} else{
 					Thread.sleep(5);
 					b.updateBall();
@@ -127,10 +142,10 @@ public class Game extends JFrame implements Runnable {
 			}
 
 			//if the thread is interrupted
-			/*catch (InterruptedException ex){
+			catch (InterruptedException ex){
 				ex.printStackTrace();
 			//handle all exceptions
-			}*/catch (Exception ex){
+			}catch (Exception ex){
 				ex.printStackTrace();
 			}//end catch
 		} //end while
