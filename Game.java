@@ -1,7 +1,7 @@
 /* a pong clone created by Christopher Wolff */
 
 import javax.swing.*; //window
-import java.awt.*;
+import java.awt.*; //painting graphics and images
 import java.util.Random; //random number generator
 import java.awt.image.BufferedImage; // for double buffering
 import java.awt.event.KeyEvent; //includes all of the constants used for input
@@ -74,9 +74,10 @@ public class Game extends JFrame implements Runnable {
 		
 		//set the game start running
 		Thread gameThread = new Thread(this);
+		
 	
 		//actually run the game 	
-		gameThread.start();
+		/*gameThread.start();*/
 				
 	} //end constructor, game init. 
 	
@@ -87,6 +88,7 @@ public class Game extends JFrame implements Runnable {
 			clip.open(AudioSystem.getAudioInputStream(sound));
 			clip.start();
 		}catch(Exception ex){
+			ex.printStackTrace(); //backtrace
 			System.out.println("PROBLEM WITH THE CLIP");
 		}
 	}
@@ -106,7 +108,7 @@ public class Game extends JFrame implements Runnable {
 			updateInput(); //if put inside the try then there is a chance user input won't be polled
 			try {
 				if (gameOver == false){
-					Thread.sleep(5);//tells the game how often to refresh
+					//Thread.sleep(5);//tells the game how often to refresh
 					doP2Behavior(); //ai
 					p1.update(); //update the player object (check the bounds and update the position)
 					p2.update(); //update other paddle
@@ -117,7 +119,7 @@ public class Game extends JFrame implements Runnable {
 					gameOver();
 					repaint(); // repaint component (draw event in gamemaker)
 				} else{
-					Thread.sleep(5);
+					//Thread.sleep(5);
 					b.updateBall();
 					checkWallBounce();
 					gameOver();
@@ -126,10 +128,10 @@ public class Game extends JFrame implements Runnable {
 			}
 			
 			//if the thread is interrupted
-			catch (InterruptedException ex){
+			/*catch (InterruptedException ex){
 				ex.printStackTrace();
 			//handle all exceptions
-			}catch (Exception ex){
+			}*/catch (Exception ex){
 				ex.printStackTrace();
 			}//end catch
 		} //end while
@@ -169,7 +171,7 @@ public class Game extends JFrame implements Runnable {
 	}
 
     public void doP2Behavior() {
-        System.out.println("ball y:" + b.getyPos() + "paddle y: " + p2.getyPos());
+        //System.out.println("ball y: " + b.getyPos() + " paddle y: " + p2.getyPos());
 		if (p2.getxPos() - b.getxPos() < 150) { // delays the AI reaction time
 			if (b.getyPos() > p2.getyPos()) {
 				// System.out.println("AI UP");
@@ -217,7 +219,7 @@ public class Game extends JFrame implements Runnable {
 				b.changeX();
 				playSound(paddle_hit);
 				b.setYVelocity(p1.getVelocity());
-				System.out.println("COLLISION");
+				//System.out.println("COLLISION");
 			}
 		}
 
@@ -226,7 +228,7 @@ public class Game extends JFrame implements Runnable {
 			if (  b.getxPos() ==  p2.getxPos() - PADDLE_WIDTH &&   b.getyPos() + BALL_RADIUS == colY){
 				b.changeX();
 				playSound(paddle_hit);
-				System.out.println("COLLISION");
+				//System.out.println("COLLISION");
 				b.setYVelocity(p1.getVelocity());
 			}
 		}	
@@ -283,6 +285,6 @@ public class Game extends JFrame implements Runnable {
 			
 			//draw the back buffer to the screen
 			g2.drawImage(myBuff, 0, 0, this); 
-		}
-	}
+		}//end paint method
+	}//end Canvas nested class
 }//end Game class
