@@ -105,8 +105,7 @@ public class Game extends JFrame implements Runnable {
 		}
 	}
 
-	//main game loop
-	//this is run when the Thread.start() is run
+		//this is run when the Thread.start() is run
 	public void run(){
 		//random object for creating a ball in a random position
 		ballRand = new Random();
@@ -115,7 +114,8 @@ public class Game extends JFrame implements Runnable {
 		p1 = new PlayerPaddle(25, GAME_HEIGHT / 2);
 		p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
 		b = new Ball(GAME_WIDTH/2, ballRand.nextInt(150) + 150,  (ballRand.nextInt(120) + 120) * (Math.PI / 180.0));
-
+		
+		//main game loop
 		while (running){
 				updateInput(); //if put inside the try then there is a chance user input won't be polled
 			try {
