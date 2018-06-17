@@ -168,6 +168,7 @@ public class Game extends JFrame implements Runnable {
 		}
 	}
 
+    //This method contains the AI for the other paddle	
     public void doP2Behavior() {
         //System.out.println("ball y: " + b.getyPos() + " paddle y: " + p2.getyPos());
 		if (p2.getxPos() - b.getxPos() < 150) { // delays the AI reaction time
@@ -209,7 +210,8 @@ public class Game extends JFrame implements Runnable {
 			}
 		}
 	}
-	
+        
+        //Check for the moment where the paddles and the ball collide	
 	public void doCollision(){
 		//left paddle collision
 		for (int colY =  p1.getyPos(); colY <  p1.getyPos() + PADDLE_HEIGHT; colY++){
@@ -242,7 +244,7 @@ public class Game extends JFrame implements Runnable {
 			}
 	}
 	//Nested class 
-	private stat class Canvas extends JPanel{
+	private class Canvas extends JPanel{
 
 		public void paint(Graphics g){
 			//weird graphics housekeeping
