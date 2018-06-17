@@ -73,8 +73,7 @@ public class Game extends JFrame implements Runnable {
 		setResizable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		add(myCanvas);
-		gameInput = new Input(this); //register input to the jFrame, which is polled
-
+		
 		//set the game start running
 		Thread gameThread = new Thread(this);
 		
@@ -107,6 +106,8 @@ public class Game extends JFrame implements Runnable {
 
 		//this is run when the Thread.start() is run
 	public void run(){
+		gameInput = new Input(this); //register input to the jFrame, which is polled
+
 		//random object for creating a ball in a random position
 		ballRand = new Random();
 
@@ -156,19 +157,19 @@ public class Game extends JFrame implements Runnable {
 		if (!gameOver){
 			if (gameInput.isKeyDown(KeyEvent.VK_UP)){
 				p1.moveUp();
-				//System.out.println("UP");
+				System.out.println("UP");
 			}
 			if (gameInput.isKeyDown(KeyEvent.VK_DOWN)){
 				p1.moveDown();
-				//System.out.println("DOWN");
+				System.out.println("DOWN");
 			}
 		}
 		if (gameOver && gameInput.isKeyDown(KeyEvent.VK_ENTER)){
-			left_score =0;
-			right_score =0;
+			left_score = 0;
+			right_score = 0;
 			gameOver = false;
 			p1 = new PlayerPaddle(25, GAME_HEIGHT / 2);
-			p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
+			p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT / 2);
 		}
 	}
 
