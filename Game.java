@@ -83,7 +83,12 @@ public class Game extends JFrame implements Runnable {
 		setResizable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		add(myCanvas);
+
 		gameInput = new Input(this); //register input to the jFrame, which is polled
+
+	
+		//request focus so the JFrame is getting the input, for sure
+		requestFocus();
 
 		//set the game start running
 		Thread gameThread = new Thread(this);
