@@ -76,7 +76,7 @@ public class Game extends JFrame implements Runnable {
 		Thread gameThread = new Thread(this);
 		
 		//actually run the game 	
-		/*gameThread.start();*/
+		gameThread.start();
 				
 	} //end constructor, game init. 
 	
@@ -197,7 +197,6 @@ public class Game extends JFrame implements Runnable {
 		if (b.getxPos() == GAME_WIDTH -(4 * Game.BALL_RADIUS)){
 			playSound(wall_hit);
 			if (gameOver == false){
-			    //Not a constant variable, so shouldn't be capitalized.
 				left_score++; 
 			}
 		}
@@ -205,7 +204,6 @@ public class Game extends JFrame implements Runnable {
 		if (b.getxPos() == 0){
 			playSound(wall_hit);
 			if (gameOver == false){
-			    //Not a constant variable, so shouldn't be capitalized. 
 				right_score++;
 			}
 		}
