@@ -10,6 +10,10 @@ import javax.sound.sampled.AudioSystem; //for playing sounds
 import javax.sound.sampled.Clip; //for playing sounds
 import javax.sound.sampled.LineUnavailableException; //audio exception
 
+//imports below used to test exceptions on ubuntu
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.AudioFormat;
 
 /*Implements the Runnable interface, so Game will be treated as a Thread to be executed
 Included in java.lang*/
@@ -37,9 +41,10 @@ public class Game extends JFrame implements Runnable {
 	boolean gameOver = false;
 
 	//file instance variables (sounds -- all graphics are rendered with Java)
-	private File miss;
-	private File paddle_hit;
-	private File wall_hit;
+	//changed the vars to String rather than File.
+	private String miss;
+	private String paddle_hit;
+	private String wall_hit;
 
 	//where execution begins
 	public static void main(String[] args){
@@ -52,9 +57,20 @@ public class Game extends JFrame implements Runnable {
 		running = true;
 
 		//set up sound files (. can be used to specify the relative path)
+<<<<<<< HEAD:java/Game.java
 		 miss = new File("../sounds/miss.wav");
 		 paddle_hit = new File("../sounds/paddle_hit.wav");
 		 wall_hit = new File("../sounds/wall_hit.wav");
+=======
+		// miss =new File( "./sounds/miss.wav");
+		// paddle_hit = new File("./sounds/paddle_hit.wav");
+		// wall_hit = new File("./sounds/wall_hit.wav");
+		//setting sounds as string for path instead of File
+		 miss = "./sounds/miss.wav";
+		 paddle_hit = "./sounds/paddle_hit.wav";
+		 wall_hit = "./sounds/wall_hit.wav";
+
+>>>>>>> 99de49ed76de3564a856978d8ad68034ed95d004:Game.java
 
 		//set up the double buffer
 		myBuff = new BufferedImage(GAME_HEIGHT, GAME_WIDTH, BufferedImage.TYPE_INT_RGB);
@@ -73,10 +89,13 @@ public class Game extends JFrame implements Runnable {
 		setResizable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		add(myCanvas);
+
+		gameInput = new Input(this); //register input to the jFrame, which is polled
+
 	
 		//request focus so the JFrame is getting the input, for sure
 		requestFocus();
-	
+
 		//set the game start running
 		Thread gameThread = new Thread(this);
 		
@@ -94,23 +113,30 @@ public class Game extends JFrame implements Runnable {
 	} //end constructor, game init.
 
 	//for playing sound files
-	public void playSound(File sound){
+	public void playSound(String sound){
 		try {
-			Clip clip = AudioSystem.getClip();
-			clip.open(AudioSystem.getAudioInputStream(sound));
-			clip.start();
+		
+			AudioInputStream inputStream = AudioSystem.getAudioInputStream(this.getClass().getResource(sound));
+           		AudioFormat format = inputStream.getFormat();
+            		DataLine.Info info = new DataLine.Info(Clip.class, format);
+			Clip clip = (Clip)AudioSystem.getLine(info);
+            		clip.open(inputStream);
+            		clip.start();
+			//Clip clip = AudioSystem.getClip();
+			//clip.open(AudioSystem.getAudioInputStream(sound));
+			//clip.start();
 		//if the audio clips compete for resources
 		}catch(LineUnavailableException ex){
 			System.out.println("handled strange audio exception");
 		}catch(Exception ex){
 			System.out.println("general clip problem");
+			ex.printStackTrace();
 		}
 	}
 
-		//this is run when the Thread.start() is run
+	//main game loop
+	//this is run when the Thread.start() is run
 	public void run(){
-		gameInput = new Input(this); //register input to the jFrame, which is polled
-
 		//random object for creating a ball in a random position
 		ballRand = new Random();
 
@@ -118,8 +144,7 @@ public class Game extends JFrame implements Runnable {
 		p1 = new PlayerPaddle(25, GAME_HEIGHT / 2);
 		p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
 		b = new Ball(GAME_WIDTH/2, ballRand.nextInt(150) + 150,  (ballRand.nextInt(120) + 120) * (Math.PI / 180.0));
-		
-		//main game loop
+
 		while (running){
 				updateInput(); //if put inside the try then there is a chance user input won't be polled
 			try {
@@ -168,11 +193,11 @@ public class Game extends JFrame implements Runnable {
 			}
 		}
 		if (gameOver && gameInput.isKeyDown(KeyEvent.VK_ENTER)){
-			left_score = 0;
-			right_score = 0;
+			left_score =0;
+			right_score =0;
 			gameOver = false;
 			p1 = new PlayerPaddle(25, GAME_HEIGHT / 2);
-			p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT / 2);
+			p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
 		}
 	}
 
