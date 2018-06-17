@@ -160,11 +160,11 @@ public class Game extends JFrame implements Runnable {
 		if (!gameOver){
 			if (gameInput.isKeyDown(KeyEvent.VK_UP)){
 				p1.moveUp();
-				System.out.println("UP");
+				//System.out.println("UP");
 			}
 			if (gameInput.isKeyDown(KeyEvent.VK_DOWN)){
 				p1.moveDown();
-				System.out.println("DOWN");
+				//System.out.println("DOWN");
 			}
 		}
 		if (gameOver && gameInput.isKeyDown(KeyEvent.VK_ENTER)){
