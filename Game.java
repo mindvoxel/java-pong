@@ -57,20 +57,11 @@ public class Game extends JFrame implements Runnable {
 		running = true;
 
 		//set up sound files (. can be used to specify the relative path)
-<<<<<<< HEAD:java/Game.java
-		 miss = new File("../sounds/miss.wav");
-		 paddle_hit = new File("../sounds/paddle_hit.wav");
-		 wall_hit = new File("../sounds/wall_hit.wav");
-=======
-		// miss =new File( "./sounds/miss.wav");
-		// paddle_hit = new File("./sounds/paddle_hit.wav");
-		// wall_hit = new File("./sounds/wall_hit.wav");
 		//setting sounds as string for path instead of File
 		 miss = "./sounds/miss.wav";
 		 paddle_hit = "./sounds/paddle_hit.wav";
 		 wall_hit = "./sounds/wall_hit.wav";
 
->>>>>>> 99de49ed76de3564a856978d8ad68034ed95d004:Game.java
 
 		//set up the double buffer
 		myBuff = new BufferedImage(GAME_HEIGHT, GAME_WIDTH, BufferedImage.TYPE_INT_RGB);
@@ -122,9 +113,6 @@ public class Game extends JFrame implements Runnable {
 			Clip clip = (Clip)AudioSystem.getLine(info);
             		clip.open(inputStream);
             		clip.start();
-			//Clip clip = AudioSystem.getClip();
-			//clip.open(AudioSystem.getAudioInputStream(sound));
-			//clip.start();
 		//if the audio clips compete for resources
 		}catch(LineUnavailableException ex){
 			System.out.println("handled strange audio exception");
