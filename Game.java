@@ -75,7 +75,6 @@ public class Game extends JFrame implements Runnable {
 		//set the game start running
 		Thread gameThread = new Thread(this);
 		
-	
 		//actually run the game 	
 		/*gameThread.start();*/
 				
@@ -149,7 +148,6 @@ public class Game extends JFrame implements Runnable {
 				//System.out.println("DOWN");
 			}
 		}
-		
 		if (gameOver && gameInput.isKeyDown(KeyEvent.VK_ENTER)){
 			left_score =0;
 			right_score =0;
@@ -234,6 +232,8 @@ public class Game extends JFrame implements Runnable {
 		}	
 	}
 	
+        //checks whether or not either of the paddles have scored 7 points -- if they have
+        //then destroy the paddles and restart the game. 	
 	public void gameOver(){
 			if((left_score >= 7 || right_score >= 7) &&  gameOver == false){
 				gameOver = true;
@@ -241,8 +241,8 @@ public class Game extends JFrame implements Runnable {
 				p2 = null;
 			}
 	}
-
-	private class Canvas extends JPanel{
+	//Nested class 
+	private stat class Canvas extends JPanel{
 
 		public void paint(Graphics g){
 			//weird graphics housekeeping
