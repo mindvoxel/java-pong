@@ -141,39 +141,31 @@ public class Game extends JFrame implements Runnable {
 		
 		/*Game loop should always be running*/
 		while (true){
-				updateInput(); //if put inside the try then there is a chance user input won't be polled
-			try {
-				if (gameOver == false){
-					Thread.sleep(5);//tells the game how often to refresh
-					doP2Behavior(); //ai
-					p1.update(); //update the player object (check the bounds and update the position)
-					p2.update(); //update other paddle
-					b.updateBall(); //update the ball object
-					destroyBall(); //point ball to null if it goes behind paddle (and creates a new one)
-					doCollision(); //checks for collisions between padles and ball
-					checkWallBounce(); //for playing the wall sounds
-					gameOver();
-					repaint(); // repaint component (draw event in gamemaker)
-					//setResizable(false);while the game is running, the window should not change size for gameplay purposes
-
-				} else{
-					Thread.sleep(5);
-					b.updateBall();
-					checkWallBounce();
-					gameOver();
-					repaint();
-				}
-			}
-
-			//if the thread is interrupted
-			catch (InterruptedException ex){
-				ex.printStackTrace();
-			//handle all exceptions
+			updateInput(); //Also includes check for reset (enter) in case of gameOver mode
+			try{
+		        	Thread.sleep(5);//tells the game how often to refresh
 			}catch (Exception ex){
-				ex.printStackTrace();
-			}//end catch
+				System.out.println("Couldn't sleep for some reason.");	
+			}
+			if (gameOver == false){
+				doP2Behavior(); //ai
+				p1.update(); //update the player object (check the bounds and update the position)
+				p2.update(); //update other paddle
+				b.updateBall(); //update the ball object
+				destroyBall(); //point ball to null if it goes behind paddle (and creates a new one)
+				doCollision(); //checks for collisions between padles and ball
+				checkWallBounce(); //for playing the wall sounds
+				gameOver();
+				repaint(); // repaint component (draw event in gamemaker)
+
+			} else{ //Game Over, man! 
+				b.updateBall();
+				checkWallBounce();
+				gameOver();
+				repaint();
+			}
 		} //end while
-	} //end run
+	}//end run
 
 	//polls the player input
 	public void updateInput(){
