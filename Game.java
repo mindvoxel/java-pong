@@ -19,7 +19,7 @@ import javax.sound.sampled.AudioFormat;
 Included in java.lang*/
 public class Game extends JFrame implements Runnable {
 
-	//constants
+	//constants (can't access non-static from a static context?)
 	public static final int GAME_HEIGHT = 450; // the height of the game window
 	public static final int GAME_WIDTH = 450; // the width of the game window
 	public static final int PADDLE_WIDTH = 13; //how wide the paddle is
@@ -31,10 +31,9 @@ public class Game extends JFrame implements Runnable {
 	public static int right_score = 0;
 
 	//instance variables
-	private boolean running; //controlling whether or not the game is running
 	private BufferedImage myBuff; //for making the game double buffered
-	private PlayerPaddle p1; //player paddle
-	private PlayerPaddle p2; //enemy paddle
+	private Paddle p1; //player paddle
+	private Paddle p2; //enemy paddle
 	private Ball b;
         private Random ballRand; //for random number generator
 	private Input gameInput; //instance variable for handling input
@@ -50,24 +49,33 @@ public class Game extends JFrame implements Runnable {
 	public static void main(String[] args){
 		new Game(); //create a new game object
 	}
-
+	
 	//constructor for starting the game
 	public Game(){
-		//want the game to start running
-		running = true;
-
-		//set up sound files (. can be used to specify the relative path)
-		//setting sounds as string for path instead of File
-		 miss = "./sounds/miss.wav";
-		 paddle_hit = "./sounds/paddle_hit.wav";
-		 wall_hit = "./sounds/wall_hit.wav";
-
-
+		/*Startup stuff*/
+		initSound();
+	        initCanvas();
 		//set up the double buffer
 		myBuff = new BufferedImage(GAME_HEIGHT, GAME_WIDTH, BufferedImage.TYPE_INT_RGB);
+		//register input to the jFrame, which is polled
+	        gameInput = new Input(this); 
 
-		//sets up the canvas which is a subclass of component
-		Canvas myCanvas = new Canvas();
+		//start the game
+		startGameThread();
+		
+	} //end constructor, game init.
+
+	public void initSound(){
+		//set up sound files (. can be used to specify the relative path)
+		//setting sounds as string for path instead of File
+		 this.miss = "./sounds/miss.wav";
+		 this.paddle_hit = "./sounds/paddle_hit.wav";
+		 this.wall_hit = "./sounds/wall_hit.wav";
+	}
+
+	/*Set up Canvas which is a child of Component and add it to (this) JFrame*/
+	public void initCanvas(){
+	        Canvas myCanvas = new Canvas();
 		myCanvas.setFocusable(true);
 
 		//housekeeping for window stuff
@@ -76,37 +84,35 @@ public class Game extends JFrame implements Runnable {
 		setVisible(true);
 		setSize(GAME_HEIGHT, GAME_WIDTH);
 		setVisible(true);
-		//if the window is not resizeable the game does not run on certain linux machines
+
+		//if the window is not resizeable the window does not open on certain linux machines
 		setResizable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		add(myCanvas);
-
-		gameInput = new Input(this); //register input to the jFrame, which is polled
-
-	
+		
 		//request focus so the JFrame is getting the input, for sure
 		requestFocus();
+	}
 
+	/*Starts the Thread which runs the game loop and various processing/updates*/
+	public void startGameThread(){
 		//set the game start running
 		Thread gameThread = new Thread(this);
-		
 		try{
-			//waits for this current thread to die before beginning execution		
+	        //waits for this current thread to die before beginning execution		
 			gameThread.join();
 		//most exceptions are contained in java.lang
 		}catch(InterruptedException ex){
 			ex.printStackTrace();
 		}
-
 		//actually run the game
 		gameThread.start();
-				
-	} //end constructor, game init.
+	}
 
+	
 	//for playing sound files
 	public void playSound(String sound){
 		try {
-		
 			AudioInputStream inputStream = AudioSystem.getAudioInputStream(this.getClass().getResource(sound));
            		AudioFormat format = inputStream.getFormat();
             		DataLine.Info info = new DataLine.Info(Clip.class, format);
@@ -129,11 +135,12 @@ public class Game extends JFrame implements Runnable {
 		ballRand = new Random();
 
                 /*instantiate all of the game objects, once*/
-		p1 = new PlayerPaddle(25, GAME_HEIGHT / 2);
-		p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
+		p1 = new Paddle(25, GAME_HEIGHT / 2);
+		p2 = new Paddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
 		b = new Ball(GAME_WIDTH/2, ballRand.nextInt(150) + 150,  (ballRand.nextInt(120) + 120) * (Math.PI / 180.0));
-
-		while (running){
+		
+		/*Game loop should always be running*/
+		while (true){
 				updateInput(); //if put inside the try then there is a chance user input won't be polled
 			try {
 				if (gameOver == false){
@@ -184,18 +191,19 @@ public class Game extends JFrame implements Runnable {
 			left_score =0;
 			right_score =0;
 			gameOver = false;
-			p1 = new PlayerPaddle(25, GAME_HEIGHT / 2);
-			p2 = new PlayerPaddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
+			p1 = new Paddle(25, GAME_HEIGHT / 2);
+			p2 = new Paddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
 		}
 	}
 
-	//points the ball to null if it goes behind
-	//either of the paddles
+	/*points the ball to null if it goes behind
+	/either of the paddles*/
 	public void destroyBall(){
 		Random ballRand = new Random();
 		if (b.isDestroyable()){
 			playSound(miss);
 			b = null;
+			/*creates the ball in the middle of the screen*/
 			b = new Ball(GAME_WIDTH/2, ballRand.nextInt(120) + 120,  (ballRand.nextInt(120) + 120 ) * (Math.PI / 180.0));
 		}
 	}
@@ -264,8 +272,8 @@ public class Game extends JFrame implements Runnable {
 		}
 	}
 
-        //checks whether or not either of the paddles have scored 7 points -- if they have
-        //then destroy the paddles and restart the game.
+        /*checks whether or not either of the paddles have scored 7 points -- if they have
+        /then destroy the paddles and restart the game.*/
 	public void gameOver(){
 			if((left_score >= 7 || right_score >= 7) &&  gameOver == false){
 				gameOver = true;

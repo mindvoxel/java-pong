@@ -1,11 +1,11 @@
 //Created by Christopher Wolff
-public class PlayerPaddle {
+public class Paddle {
 
 	private int xPos, yPos;
 	private int velocity;
 	
 	//constructor 
-	public PlayerPaddle(int xPos, int yPos) {
+	public Paddle(int xPos, int yPos) {
 		this.xPos = xPos;
 		this.yPos = yPos;
 	}
