@@ -35,7 +35,7 @@ public class Game extends JFrame implements Runnable {
 	private Paddle p1; //player paddle
 	private Paddle p2; //enemy paddle
 	private Ball b;
-        private Random ballRand; //for random number generator
+        private Random randy; //for generating random Ball directions 
 	private Input gameInput; //instance variable for handling input
 	boolean gameOver = false;
 
@@ -45,6 +45,9 @@ public class Game extends JFrame implements Runnable {
 	private String paddle_hit;
 	private String wall_hit;
 
+	/*for paddle AI*/
+	double behavior_time = 0;
+	
 	//where execution begins
 	public static void main(String[] args){
 		new Game(); //create a new game object
@@ -132,12 +135,12 @@ public class Game extends JFrame implements Runnable {
 	//this is run when the Thread.start() is run
 	public void run(){
 		//random object for creating a ball in a random position
-		ballRand = new Random();
+		randy = new Random();
 
                 /*instantiate all of the game objects, once*/
 		p1 = new Paddle(25, GAME_HEIGHT / 2);
 		p2 = new Paddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
-		b = new Ball(GAME_WIDTH/2, ballRand.nextInt(150) + 150,  (ballRand.nextInt(120) + 120) * (Math.PI / 180.0));
+		b = new Ball(GAME_WIDTH/2, randy.nextInt(150) + 150,  (randy.nextInt(120) + 120) * (Math.PI / 180.0));
 		
 		/*Game loop should always be running*/
 		while (true){
@@ -191,19 +194,26 @@ public class Game extends JFrame implements Runnable {
 	/*points the ball to null if it goes behind
 	/either of the paddles*/
 	public void destroyBall(){
-		Random ballRand = new Random();
 		if (b.isDestroyable()){
 			playSound(miss);
 			b = null;
 			/*creates the ball in the middle of the screen*/
-			b = new Ball(GAME_WIDTH/2, ballRand.nextInt(120) + 120,  (ballRand.nextInt(120) + 120 ) * (Math.PI / 180.0));
+			int ball_rand = randy.nextInt(120); 
+			/*a ball_rand of 0 will create a ball that bounces vertically, forever */ 
+			while (ball_rand == 0){
+			      ball_rand = randy.nextInt(120);
+			}
+
+			System.out.println("ball seed " + ball_rand); 
+			b = new Ball(GAME_WIDTH/2, ball_rand + 120,  (ball_rand + 120)  * (Math.PI / 180));
 		}
 	}
 
     //This method contains the AI for the other paddle
     public void doP2Behavior() {
-        //System.out.println("ball y: " + b.getyPos() + " paddle y: " + p2.getyPos());
-		if (p2.getxPos() - b.getxPos() < 150) { // delays the AI reaction time
+	        //System.out.println("ball y: " + b.getyPos() + " paddle y: " + p2.getyPos());
+		/*progressively improves the AI based on the player's score*/
+		if (p2.getxPos() - b.getxPos() < 50 + ((left_score + right_score) * 10)) { 
 			if (b.getyPos() > p2.getyPos()) {
 				// System.out.println("AI UP");
 				p2.moveDown();
@@ -214,9 +224,25 @@ public class Game extends JFrame implements Runnable {
 				// System.out.println("AI STOP");
 				p2.stop();
 			}
-		}
-	}
-
+		/*Do either up or down movement every few seconds or so if not within the AI paddle's current range*/
+		}else{
+			behavior_time += 1;
+			if (behavior_time > 100){
+			   behavior_time = 0;
+			   int choice = randy.nextInt(3);
+			   //will either generate a 0 or a 1
+			   if (choice == 1){
+			      p2.moveDown();
+			   }else if (choice == 0){
+			      p2.moveUp();	
+			   }else{
+			      //else do nothing	
+			   }
+			   //System.out.println(choice);
+		        }
+			//System.out.println(behavior_time);
+		}	
+      }
 	//for playing the wall sounds
 	public void checkWallBounce(){
 		if (b.getyPos() > Game.GAME_HEIGHT - (6 * Game.BALL_RADIUS)){
@@ -255,7 +281,7 @@ public class Game extends JFrame implements Runnable {
 
 		//right paddle collision
 		for (int colY =  p2.getyPos(); colY <  p2.getyPos() + PADDLE_HEIGHT; colY++){
-			if (  b.getxPos() ==  p2.getxPos() - PADDLE_WIDTH &&   b.getyPos() + BALL_RADIUS == colY){
+			if (b.getxPos() ==  p2.getxPos() - PADDLE_WIDTH &&  b.getyPos() + BALL_RADIUS == colY){
 				b.changeX();
 				playSound(paddle_hit);
 				//System.out.println("COLLISION");
@@ -267,11 +293,11 @@ public class Game extends JFrame implements Runnable {
         /*checks whether or not either of the paddles have scored 7 points -- if they have
         /then destroy the paddles and restart the game.*/
 	public void gameOver(){
-			if((left_score >= 7 || right_score >= 7) &&  gameOver == false){
-				gameOver = true;
-				p1 = null;
-				p2 = null;
-			}
+		if((left_score >= 7 || right_score >= 7) &&  gameOver == false){
+			gameOver = true;
+			p1 = null;
+			p2 = null;
+		}
 	}
 	//Nested class
 	private class Canvas extends JPanel{
