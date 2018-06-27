@@ -17,6 +17,7 @@ public class Ball {
 		xVelocity = (int)(Math.cos(angle) * (double) directionVector);
 		yVelocity = (int)(Math.sin(angle) * (double) directionVector);
 		destroyable = false;
+		//System.out.println(angle);
 	
 	}
 	//update position
