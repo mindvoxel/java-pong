@@ -204,7 +204,7 @@ public class Game extends JFrame implements Runnable {
 			      ball_rand = randy.nextInt(120);
 			}
 
-			System.out.println("ball seed " + ball_rand); 
+			//System.out.println("ball seed " + ball_rand); 
 			b = new Ball(GAME_WIDTH/2, ball_rand + 120,  (ball_rand + 120)  * (Math.PI / 180));
 		}
 	}
