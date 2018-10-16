@@ -35,7 +35,8 @@ public class Game extends JFrame implements Runnable {
 	private Paddle p1; //player paddle
 	private Paddle p2; //enemy paddle
 	private Ball b;
-        private Random randy; //for generating random Ball directions 
+	private Object ball_mutex = new Object(); // ensure concurrency is handled correctly
+	private Random randy; //for generating random Ball directions
 	private Input gameInput; //instance variable for handling input
 	boolean gameOver = false;
 
@@ -140,7 +141,10 @@ public class Game extends JFrame implements Runnable {
                 /*instantiate all of the game objects, once*/
 		p1 = new Paddle(25, GAME_HEIGHT / 2);
 		p2 = new Paddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
-		b = new Ball(GAME_WIDTH/2, randy.nextInt(150) + 150,  (randy.nextInt(120) + 120) * (Math.PI / 180.0));
+		synchronized (ball_mutex) { // We will create the ball - make sure it doesn't get painted at the same time
+			b = new Ball(GAME_WIDTH / 2, randy.nextInt(150) + 150,
+					(randy.nextInt(120) + 120) * (Math.PI / 180.0));
+		}
 		
 		/*Game loop should always be running*/
 		while (true){
@@ -196,7 +200,9 @@ public class Game extends JFrame implements Runnable {
 	public void destroyBall(){
 		if (b.isDestroyable()){
 			playSound(miss);
-			b = null;
+			synchronized (ball_mutex) { // We will delete the ball - make sure it doesn't get painted at the same time
+				b = null;
+			}
 			/*creates the ball in the middle of the screen*/
 			int ball_rand = randy.nextInt(120); 
 			/*a ball_rand of 0 will create a ball that bounces vertically, forever */ 
@@ -204,8 +210,10 @@ public class Game extends JFrame implements Runnable {
 			      ball_rand = randy.nextInt(120);
 			}
 
-			//System.out.println("ball seed " + ball_rand); 
-			b = new Ball(GAME_WIDTH/2, ball_rand + 120,  (ball_rand + 120)  * (Math.PI / 180));
+			//System.out.println("ball seed " + ball_rand);
+			synchronized (ball_mutex) { // We will create the ball - make sure it doesn't get painted at the same time
+				b = new Ball(GAME_WIDTH / 2, ball_rand + 120, (ball_rand + 120) * (Math.PI / 180));
+			}
 		}
 	}
 
@@ -314,7 +322,11 @@ public class Game extends JFrame implements Runnable {
 				g2.fillRect(  p1.getxPos(),  p1.getyPos(), PADDLE_WIDTH, PADDLE_HEIGHT); // draw player paddle
 				g2.fillRect( p2.getxPos(),  p2.getyPos(), PADDLE_WIDTH, PADDLE_HEIGHT); // draw computer paddle
 			}
-			g2.fillOval(  b.getxPos(),  b.getyPos(), BALL_RADIUS * 2, BALL_RADIUS * 2);
+			synchronized (ball_mutex) { // Wait until nothing else is creating/deleting the ball
+				if (b != null) {
+					g2.fillOval(b.getxPos(), b.getyPos(), BALL_RADIUS * 2, BALL_RADIUS * 2);
+				}
+			}
 			for (int i =0; i < GAME_WIDTH; i+=10){ //dotted line
 				g2.drawLine(GAME_WIDTH/2,i,GAME_WIDTH/2,i +5);
 			}
@@ -333,7 +345,11 @@ public class Game extends JFrame implements Runnable {
 				back_buffer_drawer.fillRect(  p1.getxPos(),  p1.getyPos(), PADDLE_WIDTH, PADDLE_HEIGHT); // draw player paddle
 				back_buffer_drawer.fillRect( p2.getxPos(),  p2.getyPos(), PADDLE_WIDTH, PADDLE_HEIGHT); // draw computer paddle
 			}
-			back_buffer_drawer.fillOval(  b.getxPos(),  b.getyPos(), BALL_RADIUS * 2, BALL_RADIUS * 2);
+			synchronized (ball_mutex) { // Wait until nothing else is creating/deleting the ball
+				if (b != null) {
+					back_buffer_drawer.fillOval(b.getxPos(), b.getyPos(), BALL_RADIUS * 2, BALL_RADIUS * 2);
+				}
+			}
 			for (int i =0; i < GAME_WIDTH; i+=10){ //dotted line
 				back_buffer_drawer.drawLine(GAME_WIDTH/2,i,GAME_WIDTH/2,i +5);
 			}
