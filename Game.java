@@ -1,5 +1,3 @@
-/* a pong clone created by Christopher Wolff */
-
 import javax.swing.*; //window
 import java.awt.*; //painting graphics and images
 import java.util.Random; //random number generator

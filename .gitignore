@@ -1,0 +1,3 @@
+# Don't want to track any compiled Java Code
+*.class
+*.jar
