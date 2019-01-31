@@ -1,3 +1,7 @@
 # Don't want to track any compiled Java Code
 *.class
 *.jar
+
+# Ignore VS Code Java Extension stuff (Ignore IDE)
+.vscode
+launch.json

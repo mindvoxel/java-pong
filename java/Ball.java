@@ -16,7 +16,6 @@ public class Ball {
 		yVelocity = (int)(Math.sin(angle) * (double) directionVector);
 		destroyable = false;
 		//System.out.println(angle);
-	
 	}
 	//update position
 	public void updateBall(){
@@ -25,25 +24,25 @@ public class Ball {
 		//System.out.println(angle);
 		//right bound checking
 		if (xPos > Game.GAME_WIDTH -(4 * Game.BALL_RADIUS)){
-			changeX();
+			reverseXVelocity();
 			destroyable = true;
 		}
 		
 		//left bound checking
 		if (xPos < 0){
-			changeX();
+			reverseXVelocity();
 			destroyable = true;
 		}
 		
 		//down bound checking
 		if (yPos > Game.GAME_HEIGHT - (6 * Game.BALL_RADIUS)){
-			changeY();
+			reverseYVelocity();
 			
 		}
 		
 		//upper bound checking
 		if (yPos < 0){
-			changeY();
+			reverseYVelocity();
 		}
 
 	}
@@ -57,13 +56,14 @@ public class Ball {
 		return this.yPos;
 	}
 	
-	//for swapping directions
-	//not encapsulated
-	public void changeX(){
+	/*For swapping directions:
+	would actually prefer for setting velocity to be more encapsulated
+	and controlled by the Ball class*/
+	public void reverseXVelocity(){
 		xVelocity = -xVelocity;
 	}
 	
-	public void changeY(){
+	public void reverseYVelocity(){
 		yVelocity = -yVelocity;
 	}
 	
@@ -71,6 +71,7 @@ public class Ball {
 		return destroyable;
 	}
 	
+	//setter
 	public void setYVelocity(int y){
 		yVelocity = y;
 	}
