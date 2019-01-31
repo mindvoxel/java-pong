@@ -44,7 +44,7 @@ public class Game extends JFrame implements Runnable {
 	private String paddle_hit;
 	private String wall_hit;
 
-	/*for paddle AI*/
+	//for paddle AI
 	double behavior_time = 0;
 	
 	//where execution begins
@@ -56,15 +56,13 @@ public class Game extends JFrame implements Runnable {
 	public Game(){
 		/*Startup stuff*/
 		initSound();
-	        initCanvas();
+	    initCanvas();
 		//set up the double buffer
 		myBuff = new BufferedImage(GAME_HEIGHT, GAME_WIDTH, BufferedImage.TYPE_INT_RGB);
 		//register input to the jFrame, which is polled
-	        gameInput = new Input(this); 
-
+	    gameInput = new Input(this); 
 		//start the game
 		startGameThread();
-		
 	} //end constructor, game init.
 
 	public void initSound(){
@@ -75,14 +73,14 @@ public class Game extends JFrame implements Runnable {
 		 this.wall_hit = "./sounds/wall_hit.wav";
 	}
 
-	/*Set up Canvas which is a child of Component and add it to (this) JFrame*/
+	//Set up Canvas which is a child of Component and add it to (this) JFrame
 	public void initCanvas(){
 	        Canvas myCanvas = new Canvas();
 		myCanvas.setFocusable(true);
 
 		//housekeeping for window stuff
 		setLayout(new GridLayout());
-		setTitle("Rolo Pong");
+		setTitle("Java Pong");
 		setVisible(true);
 		setSize(GAME_HEIGHT, GAME_WIDTH);
 		setVisible(true);
