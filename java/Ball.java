@@ -1,9 +1,10 @@
 public class Ball {
-	//private members cannot be accesed from other classes
+	public static final int RADIUS = 10; //size of the Ball
+
 	private int directionVector = 2;
 	private int xVelocity, yVelocity, xPos, yPos;
 	private double angle;
-	boolean destroyable;
+	private boolean destroyable;
 		
 	//When a ball is created, we can provide a default value
 	//to the constructor
@@ -23,7 +24,7 @@ public class Ball {
 		yPos += yVelocity;
 		//System.out.println(angle);
 		//right bound checking
-		if (xPos > Game.GAME_WIDTH -(4 * Game.BALL_RADIUS)){
+		if (xPos > Game.WINDOW_WIDTH -(4 * RADIUS)){
 			reverseXVelocity();
 			destroyable = true;
 		}
@@ -35,7 +36,7 @@ public class Ball {
 		}
 		
 		//down bound checking
-		if (yPos > Game.GAME_HEIGHT - (6 * Game.BALL_RADIUS)){
+		if (yPos > Game.WINDOW_HEIGHT - (6 * RADIUS)){
 			reverseYVelocity();
 			
 		}

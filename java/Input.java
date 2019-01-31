@@ -1,5 +1,3 @@
-//Created by Christopher Wolff
-
 import java.awt.Component;
 import java.awt.event.KeyListener; //interface for overriding and defining behavior
 import java.awt.event.KeyEvent; //includes all of the constants used for input

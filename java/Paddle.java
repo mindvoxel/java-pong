@@ -1,5 +1,7 @@
-//Created by Christopher Wolff
 public class Paddle {
+
+	public static final int WIDTH = 13; //how wide the paddle is
+	public static final int HEIGHT = 70; //how tall the paddle is
 
 	private int xPos, yPos;
 	private int velocity;
@@ -21,8 +23,8 @@ public class Paddle {
 		}
 		
 		//bottom of the screen
-		if (yPos > Game.GAME_HEIGHT - 110){
-			yPos = Game.GAME_HEIGHT - 110;
+		if (yPos > Game.WINDOW_HEIGHT - 110){
+			yPos = Game.WINDOW_HEIGHT - 110;
 		}
 	}
 	
@@ -52,9 +54,4 @@ public class Paddle {
 		return velocity;
 	}
 	
-	//setter
-	private void setyPos(int yPos) {
-		this.yPos = yPos;
-	}
-
 }

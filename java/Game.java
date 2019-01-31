@@ -20,11 +20,8 @@ Included in java.lang*/
 public class Game extends JFrame implements Runnable {
 
 	//constants 
-	protected static final int GAME_HEIGHT = 450; // the height of the game window
-	protected static final int GAME_WIDTH = 450; // the width of the game window
-	protected static final int PADDLE_WIDTH = 13; //how wide the paddle is
-	protected static final int PADDLE_HEIGHT = 70; //how tall the paddle is
-	protected static final int BALL_RADIUS = 10; //size of the Ball
+	protected static final int WINDOW_HEIGHT = 450; // the height of the game window
+	protected static final int WINDOW_WIDTH = 450; // the width of the game window
 
 	//static vars
 	public static int left_score = 0;
@@ -59,7 +56,7 @@ public class Game extends JFrame implements Runnable {
 		initSound();
 	    initCanvas();
 		//set up the double buffer
-		myBuff = new BufferedImage(GAME_HEIGHT, GAME_WIDTH, BufferedImage.TYPE_INT_RGB);
+		myBuff = new BufferedImage(WINDOW_HEIGHT, WINDOW_WIDTH, BufferedImage.TYPE_INT_RGB);
 		//register input to the jFrame, which is polled
 	    gameInput = new Input(this); 
 		//start the game
@@ -83,7 +80,7 @@ public class Game extends JFrame implements Runnable {
 		setLayout(new GridLayout());
 		setTitle("Java Pong");
 		setVisible(true);
-		setSize(GAME_HEIGHT, GAME_WIDTH);
+		setSize(WINDOW_HEIGHT, WINDOW_WIDTH);
 		setVisible(true);
 
 		//if the window is not resizeable the window does not open on certain linux machines
@@ -137,10 +134,10 @@ public class Game extends JFrame implements Runnable {
 		random_generator = new Random();
 		
 		/*instantiate all of the game objects, once*/
-		player1 = new Paddle(25, GAME_HEIGHT / 2);
-		player2 = new Paddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
+		player1 = new Paddle(25, WINDOW_HEIGHT / 2);
+		player2 = new Paddle(WINDOW_WIDTH - 50, WINDOW_HEIGHT /2);
 		synchronized (ball_mutex) { // We will create the ball - make sure it doesn't get painted at the same time
-			ball = new Ball(GAME_WIDTH / 2, random_generator.nextInt(150) + 150,
+			ball = new Ball(WINDOW_WIDTH / 2, random_generator.nextInt(150) + 150,
 					(random_generator.nextInt(120) + 120) * (Math.PI / 180.0));
 		}
 		
@@ -188,8 +185,8 @@ public class Game extends JFrame implements Runnable {
 			left_score =0;
 			right_score =0;
 			gameOver = false;
-			player1 = new Paddle(25, GAME_HEIGHT / 2);
-			player2 = new Paddle(GAME_WIDTH - 50, GAME_HEIGHT /2);
+			player1 = new Paddle(25, WINDOW_HEIGHT / 2);
+			player2 = new Paddle(WINDOW_WIDTH - 50, WINDOW_HEIGHT /2);
 		}
 	}
 
@@ -210,7 +207,7 @@ public class Game extends JFrame implements Runnable {
 
 			//System.out.println("ball seed " + ball_rand);
 			synchronized (ball_mutex) { // We will create the ball - make sure it doesn't get painted at the same time
-				ball = new Ball(GAME_WIDTH / 2, ball_rand + 120, (ball_rand + 120) * (Math.PI / 180));
+				ball = new Ball(WINDOW_WIDTH / 2, ball_rand + 120, (ball_rand + 120) * (Math.PI / 180));
 			}
 		}
 	}
@@ -251,14 +248,14 @@ public class Game extends JFrame implements Runnable {
       }
 	//for playing the wall sounds
 	public void checkWallBounce(){
-		if (ball.getyPos() > Game.GAME_HEIGHT - (6 * Game.BALL_RADIUS)){
+		if (ball.getyPos() > WINDOW_HEIGHT - (6 * Ball.RADIUS)){
 			playSound(wall_hit);
 		}
 		if (ball.getyPos() < 0){
 			playSound(wall_hit);
 		}
 
-		if (ball.getxPos() == GAME_WIDTH -(4 * Game.BALL_RADIUS)){
+		if (ball.getxPos() == WINDOW_WIDTH -(4 * Ball.RADIUS)){
 			playSound(wall_hit);
 			if (gameOver == false){
 				left_score++;
@@ -276,8 +273,8 @@ public class Game extends JFrame implements Runnable {
         //Check for the moment where the paddles and the ball collide
 	public void doCollision(){
 		//left paddle collision
-		for (int colY =  player1.getyPos(); colY <  player1.getyPos() + PADDLE_HEIGHT; colY++){
-			if (  ball.getxPos() ==  player1.getxPos() &&   ball.getyPos() + BALL_RADIUS == colY){
+		for (int colY =  player1.getyPos(); colY <  player1.getyPos() + Paddle.HEIGHT; colY++){
+			if (  ball.getxPos() ==  player1.getxPos() &&   ball.getyPos() + Ball.RADIUS == colY){
 				ball.reverseXVelocity();
 				playSound(paddle_hit);
 				ball.setYVelocity(player1.getVelocity());
@@ -286,8 +283,8 @@ public class Game extends JFrame implements Runnable {
 		}
 
 		//right paddle collision
-		for (int colY =  player2.getyPos(); colY <  player2.getyPos() + PADDLE_HEIGHT; colY++){
-			if (ball.getxPos() ==  player2.getxPos() - PADDLE_WIDTH &&  ball.getyPos() + BALL_RADIUS == colY){
+		for (int colY =  player2.getyPos(); colY <  player2.getyPos() + Paddle.HEIGHT; colY++){
+			if (ball.getxPos() ==  player2.getxPos() - Paddle.WIDTH &&  ball.getyPos() + Ball.RADIUS == colY){
 				ball.reverseXVelocity();
 				playSound(paddle_hit);
 				//System.out.println("COLLISION");
@@ -314,46 +311,46 @@ public class Game extends JFrame implements Runnable {
 
 			//drawing the 'sprites' for the game
 			g2.setColor(Color.BLACK);
-			g2.fillRect(0, 0, GAME_HEIGHT, GAME_WIDTH); // fill the whole screen black
+			g2.fillRect(0, 0, WINDOW_HEIGHT, WINDOW_WIDTH); // fill the whole screen black
 			g2.setColor(Color.WHITE);
 			if (gameOver == false){
-				g2.fillRect(  player1.getxPos(),  player1.getyPos(), PADDLE_WIDTH, PADDLE_HEIGHT); // draw player paddle
-				g2.fillRect( player2.getxPos(),  player2.getyPos(), PADDLE_WIDTH, PADDLE_HEIGHT); // draw computer paddle
+				g2.fillRect(  player1.getxPos(),  player1.getyPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw player paddle
+				g2.fillRect( player2.getxPos(),  player2.getyPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw computer paddle
 			}
 			synchronized (ball_mutex) { // Wait until nothing else is creating/deleting the ball
 				if (ball != null) {
-					g2.fillOval(ball.getxPos(), ball.getyPos(), BALL_RADIUS * 2, BALL_RADIUS * 2);
+					g2.fillOval(ball.getxPos(), ball.getyPos(), Ball.RADIUS * 2, Ball.RADIUS * 2);
 				}
 			}
-			for (int i =0; i < GAME_WIDTH; i+=10){ //dotted line
-				g2.drawLine(GAME_WIDTH/2,i,GAME_WIDTH/2,i +5);
+			for (int i =0; i < WINDOW_WIDTH; i+=10){ //dotted line
+				g2.drawLine(WINDOW_WIDTH/2,i,WINDOW_WIDTH/2,i +5);
 			}
 			g2.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 72));
-			g2.drawString("" + left_score, GAME_WIDTH/2 -150, 100);
-			g2.drawString("" + right_score, GAME_WIDTH/2 + 100, 100);
+			g2.drawString("" + left_score, WINDOW_WIDTH/2 -150, 100);
+			g2.drawString("" + right_score, WINDOW_WIDTH/2 + 100, 100);
 
 			//double buffering
 			Graphics2D back_buffer_drawer = (Graphics2D) myBuff.getGraphics();
 
 			//Drawing the 'sprites' for the game (to the back bufer
 			back_buffer_drawer.setColor(Color.BLACK);
-			back_buffer_drawer.fillRect(0, 0, GAME_HEIGHT, GAME_WIDTH); // fill the whole screen black
+			back_buffer_drawer.fillRect(0, 0, WINDOW_HEIGHT, WINDOW_WIDTH); // fill the whole screen black
 			back_buffer_drawer.setColor(Color.WHITE);
 			if (gameOver == false){
-				back_buffer_drawer.fillRect(  player1.getxPos(),  player1.getyPos(), PADDLE_WIDTH, PADDLE_HEIGHT); // draw player paddle
-				back_buffer_drawer.fillRect( player2.getxPos(),  player2.getyPos(), PADDLE_WIDTH, PADDLE_HEIGHT); // draw computer paddle
+				back_buffer_drawer.fillRect(  player1.getxPos(),  player1.getyPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw player paddle
+				back_buffer_drawer.fillRect( player2.getxPos(),  player2.getyPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw computer paddle
 			}
 			synchronized (ball_mutex) { // Wait until nothing else is creating/deleting the ball
 				if (ball != null) {
-					back_buffer_drawer.fillOval(ball.getxPos(), ball.getyPos(), BALL_RADIUS * 2, BALL_RADIUS * 2);
+					back_buffer_drawer.fillOval(ball.getxPos(), ball.getyPos(), Ball.RADIUS * 2, Ball.RADIUS * 2);
 				}
 			}
-			for (int i =0; i < GAME_WIDTH; i+=10){ //dotted line
-				back_buffer_drawer.drawLine(GAME_WIDTH/2,i,GAME_WIDTH/2,i +5);
+			for (int i =0; i < WINDOW_WIDTH; i+=10){ //dotted line
+				back_buffer_drawer.drawLine(WINDOW_WIDTH/2,i,WINDOW_WIDTH/2,i +5);
 			}
 			back_buffer_drawer.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 72));
-			back_buffer_drawer.drawString("" + left_score, GAME_WIDTH/2 - 150, 100);
-			back_buffer_drawer.drawString("" + right_score, GAME_WIDTH/2 + 100, 100);
+			back_buffer_drawer.drawString("" + left_score, WINDOW_WIDTH/2 - 150, 100);
+			back_buffer_drawer.drawString("" + right_score, WINDOW_WIDTH/2 + 100, 100);
 
 			//draw the back buffer to the screen
 			g2.drawImage(myBuff, 0, 0, this);
