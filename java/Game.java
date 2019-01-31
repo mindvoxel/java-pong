@@ -28,7 +28,7 @@ public class Game extends JFrame implements Runnable {
 	public static int right_score = 0;
 
 	//instance variables
-	private BufferedImage myBuff; //for making the game double buffered
+	private BufferedImage backBuffer; //for making the game double buffered
 	private Paddle player1; //player paddle
 	private Paddle player2; //enemy paddle
 	private Ball ball;
@@ -56,7 +56,7 @@ public class Game extends JFrame implements Runnable {
 		initSound();
 	    initCanvas();
 		//set up the double buffer
-		myBuff = new BufferedImage(WINDOW_HEIGHT, WINDOW_WIDTH, BufferedImage.TYPE_INT_RGB);
+		backBuffer = new BufferedImage(WINDOW_HEIGHT, WINDOW_WIDTH, BufferedImage.TYPE_INT_RGB);
 		//register input to the jFrame, which is polled
 	    gameInput = new Input(this); 
 		//start the game
@@ -305,6 +305,11 @@ public class Game extends JFrame implements Runnable {
 	//Nested class
 	private class Canvas extends JPanel{
 
+		/*Seems terrible that this method has to draw everything twice,
+		once to the back-buffer, and once to the front-buffer. This should be
+		resolved by calling this method twice, once with front buffer and once with
+		the back-buffer (perhaps as method arguments) But the problem with this is that
+		the paint method is overriden and needs to have only Graphics as a parameter*/
 		public void paint(Graphics g){
 			//weird graphics housekeeping
 			Graphics2D g2 = (Graphics2D) g;
@@ -330,7 +335,7 @@ public class Game extends JFrame implements Runnable {
 			g2.drawString("" + right_score, WINDOW_WIDTH/2 + 100, 100);
 
 			//double buffering
-			Graphics2D back_buffer_drawer = (Graphics2D) myBuff.getGraphics();
+			Graphics2D back_buffer_drawer = (Graphics2D) backBuffer.getGraphics();
 
 			//Drawing the 'sprites' for the game (to the back bufer
 			back_buffer_drawer.setColor(Color.BLACK);
@@ -353,7 +358,7 @@ public class Game extends JFrame implements Runnable {
 			back_buffer_drawer.drawString("" + right_score, WINDOW_WIDTH/2 + 100, 100);
 
 			//draw the back buffer to the screen
-			g2.drawImage(myBuff, 0, 0, this);
+			g2.drawImage(backBuffer, 0, 0, this);
 		}//end paint method
 	}//end Canvas nested class
 }//end Game class
