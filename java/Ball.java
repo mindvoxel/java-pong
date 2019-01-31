@@ -6,17 +6,20 @@ public class Ball {
 	private double angle;
 	private boolean destroyable;
 		
-	//When a ball is created, we can provide a default value
-	//to the constructor
 	public Ball(int xPos, int yPos, double angle){
+		//in case a crazy person tries to create a Ball with values outside of the Game screen, or a strange angle
+		if(true){
+			//then just create a ball in the middle of the screen
+		}
+
 		this.xPos = xPos;
 		this.yPos = yPos;
 		this.angle = angle;
-		//init the velocity 
+		//init the velocity in both directions
 		xVelocity = (int)(Math.cos(angle) * (double) directionVector);
 		yVelocity = (int)(Math.sin(angle) * (double) directionVector);
 		destroyable = false;
-		//System.out.println(angle);
+		System.out.println(angle);
 	}
 	//update position
 	public void updateBall(){
@@ -49,11 +52,11 @@ public class Ball {
 	}
 	
 	//getters
-	public int getxPos(){
+	public int getXPos(){
 		return this.xPos;
 	}
 
-	public int getyPos(){
+	public int getYPos(){
 		return this.yPos;
 	}
 	
