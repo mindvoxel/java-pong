@@ -16,7 +16,7 @@ Download the Java Development Kit (JDK). Versions 7 and above would be suitable.
 ### Downloading and Running the Source Code
 
 1. Fork and clone the java-pong repository.
-2. Navigate to the cloned repository's directory and run the following command to compile the project’s java files. 
+2. Navigate to the cloned repository's `java` directory and run the following command to compile the project’s java files. 
 
 ~~~
 javac *.java
