@@ -1,6 +1,6 @@
 java-pong 
 ======
-Java-pong is a table tennis game built with the Java 9 API. The user plays against a simple AI and the winner is the player who scores seven points first. You can play the game [here](cool-free-games.com/java-pong).
+Java-pong is a table tennis game built with the Java 9 API. The user plays against a simple AI and the winner is the player who scores seven points first. You can play the game [here](cool-free-games.com/java-pong) (Website is not yet functional).
 
 ## Game Instructions
 
