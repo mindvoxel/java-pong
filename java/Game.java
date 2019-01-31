@@ -28,7 +28,6 @@ public class Game extends JFrame implements Runnable {
 	public static int right_score = 0;
 
 	//instance variables
-	private BufferedImage backBuffer; //for making the game double buffered
 	private Paddle player1; //player paddle
 	private Paddle player2; //enemy paddle
 	private Ball ball;
@@ -311,7 +310,7 @@ public class Game extends JFrame implements Runnable {
 		the back-buffer (perhaps as method arguments) But the problem with this is that
 		the paint method is overriden and needs to have only Graphics as a parameter*/
 		public void paint(Graphics g){
-			//weird graphics housekeeping
+			//weird swing graphics housekeeping
 			Graphics2D g2 = (Graphics2D) g;
 
 			//drawing the 'sprites' for the game
@@ -319,7 +318,7 @@ public class Game extends JFrame implements Runnable {
 			g2.fillRect(0, 0, WINDOW_HEIGHT, WINDOW_WIDTH); // fill the whole screen black
 			g2.setColor(Color.WHITE);
 			if (gameOver == false){
-				g2.fillRect(  player1.getxPos(),  player1.getyPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw player paddle
+				g2.fillRect( player1.getxPos(),  player1.getyPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw player paddle
 				g2.fillRect( player2.getxPos(),  player2.getyPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw computer paddle
 			}
 			synchronized (ball_mutex) { // Wait until nothing else is creating/deleting the ball
@@ -334,31 +333,6 @@ public class Game extends JFrame implements Runnable {
 			g2.drawString("" + left_score, WINDOW_WIDTH/2 -150, 100);
 			g2.drawString("" + right_score, WINDOW_WIDTH/2 + 100, 100);
 
-			//double buffering
-			Graphics2D back_buffer_drawer = (Graphics2D) backBuffer.getGraphics();
-
-			//Drawing the 'sprites' for the game (to the back bufer
-			back_buffer_drawer.setColor(Color.BLACK);
-			back_buffer_drawer.fillRect(0, 0, WINDOW_HEIGHT, WINDOW_WIDTH); // fill the whole screen black
-			back_buffer_drawer.setColor(Color.WHITE);
-			if (gameOver == false){
-				back_buffer_drawer.fillRect(  player1.getxPos(),  player1.getyPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw player paddle
-				back_buffer_drawer.fillRect( player2.getxPos(),  player2.getyPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw computer paddle
-			}
-			synchronized (ball_mutex) { // Wait until nothing else is creating/deleting the ball
-				if (ball != null) {
-					back_buffer_drawer.fillOval(ball.getxPos(), ball.getyPos(), Ball.RADIUS * 2, Ball.RADIUS * 2);
-				}
-			}
-			for (int i =0; i < WINDOW_WIDTH; i+=10){ //dotted line
-				back_buffer_drawer.drawLine(WINDOW_WIDTH/2,i,WINDOW_WIDTH/2,i +5);
-			}
-			back_buffer_drawer.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 72));
-			back_buffer_drawer.drawString("" + left_score, WINDOW_WIDTH/2 - 150, 100);
-			back_buffer_drawer.drawString("" + right_score, WINDOW_WIDTH/2 + 100, 100);
-
-			//draw the back buffer to the screen
-			g2.drawImage(backBuffer, 0, 0, this);
 		}//end paint method
 	}//end Canvas nested class
 }//end Game class
