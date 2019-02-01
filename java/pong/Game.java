@@ -136,8 +136,8 @@ public class Game extends JFrame implements Runnable {
 		random_generator = new Random();
 		
 		/*instantiate all of the game objects, once*/
-		player1 = new Paddle(25, WINDOW_HEIGHT / 2);
-		player2 = new Paddle(WINDOW_WIDTH - 50, WINDOW_HEIGHT /2);
+		player1 = new Paddle(Paddle.WIDTH, WINDOW_HEIGHT / 2);
+		player2 = new Paddle(WINDOW_WIDTH - Paddle.WIDTH, WINDOW_HEIGHT /2);
 		synchronized (ball_mutex) { // We will create the ball - make sure it doesn't get painted at the same time
 			ball = new Ball(WINDOW_WIDTH / 2, random_generator.nextInt(150) + 150,
 					(random_generator.nextInt(120) + 120) * (Math.PI / 180.0));
@@ -244,16 +244,24 @@ public class Game extends JFrame implements Runnable {
       }//end else	
 	  }//end function
 
-	//for playing the wall sounds
+	//for playing the wall sounds, else-if because don't want any sounds to play or wall collision behavior to happen simultaneously
 	public void checkWallBounce(){
 		if ((ball.getYPos() >= (WINDOW_HEIGHT - (6 * Ball.RADIUS))) || (ball.getYPos() <= 0)){
-			System.out.println("Top or bottom \'wall\' was hit");
+			//System.out.println("Top or bottom \'wall\' was hit");
 			playSound(wall_hit); //do this regardless of whether the game is over or not
-		}else if (ball.getXPos() == (WINDOW_WIDTH - (4 * Ball.RADIUS)) || ball.getXPos() == 0){ //don't want both behaviors at once
+		}else if (ball.getXPos() == (WINDOW_WIDTH - (4 * Ball.RADIUS))){ 
 			if (gameOver){
 				playSound(wall_hit);
 			}else{
 				playSound(miss); //only play out-of-bounds x misses if there is a game in progress
+				left_score++;
+			}
+		}else if(ball.getXPos() == 0){
+			if (gameOver){
+				playSound(wall_hit);
+			}else{
+				playSound(miss); 
+				right_score++;
 			}
 		}
 	}

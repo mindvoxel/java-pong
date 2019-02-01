@@ -9,13 +9,19 @@ public class Ball {
 	private boolean destroyable;
 		
 	public Ball(int xPos, int yPos, double angle){
-		//in case a crazy person tries to create a Ball with values outside of the Game screen, or a strange angle
-		if(true){
-			//then just create a ball in the middle of the screen
+		//in case a crazy person tries to create a Ball with values outside of the Game screen
+		if((yPos >= (Game.WINDOW_HEIGHT - (6 * RADIUS))) 
+			|| (yPos <= 0) 
+			|| (xPos == (Game.WINDOW_WIDTH - (4 * RADIUS)))
+			|| (xPos == 0)){
+			//then set ball x and y to be middle of the screen
+			this.xPos = Game.WINDOW_WIDTH/2;
+			this.yPos = Game.WINDOW_HEIGHT/2;			
+		}else{
+			this.xPos = xPos;
+			this.yPos = yPos;
 		}
 
-		this.xPos = xPos;
-		this.yPos = yPos;
 		this.angle = angle;
 		//init the velocity in both directions
 		xVelocity = (int)(Math.cos(angle) * (double) directionVector);
