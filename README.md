@@ -29,5 +29,5 @@ java pong.Game
 
 ## Bugs and support
 * To report bugs and request features, please use the GitHub issue tracker at:
-<br /> https://github.com/christopher-wolff23/java-pong/issues
+<br /> https://github.com/chris-wolff/java-pong/issues
 * For more information on contributing, see the [contributing guide](https://github.com/chris-wolff/java-pong/blob/master/CONTRIBUTING.md)
