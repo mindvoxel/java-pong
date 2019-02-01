@@ -1,3 +1,5 @@
+package pong;
+
 public class Paddle {
 
 	public static final int WIDTH = 13; //how wide the paddle is

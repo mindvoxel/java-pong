@@ -1,3 +1,5 @@
+package pong;
+
 import javax.swing.*; //window
 import java.awt.*; //painting graphics and images
 import java.util.Random; //random number generator
@@ -6,6 +8,8 @@ import java.awt.event.KeyEvent; //includes all of the constants used for input
 
 //for audio files
 import java.io.File;
+
+import player.Input;
 
 //confusing audio imports
 import javax.sound.sampled.AudioInputStream;
@@ -23,7 +27,8 @@ public class Game extends JFrame implements Runnable {
 	protected static final int WINDOW_HEIGHT = 450; // the height of the game window
 	protected static final int WINDOW_WIDTH = 450; // the width of the game window
 
-	//static vars
+	//static vars, placed here instead of Paddle because scores don't necessarily belong to a paddle; didn't want extra bloat code 
+	//for score getter, setter, incrementation, etc.
 	public static int left_score = 0;
 	public static int right_score = 0;
 
@@ -42,7 +47,7 @@ public class Game extends JFrame implements Runnable {
 	private String wall_hit;
 
 	//for paddle AI
-	double behavior_time = 0;
+	private double behavior_time = 0;
 	
 	//where execution begins
 	public static void main(String[] args){
@@ -241,9 +246,10 @@ public class Game extends JFrame implements Runnable {
 
 	//for playing the wall sounds
 	public void checkWallBounce(){
-		if ((ball.getYPos() >= WINDOW_HEIGHT - (6 * Ball.RADIUS)) || (ball.getYPos() <= 0)){
+		if ((ball.getYPos() >= (WINDOW_HEIGHT - (6 * Ball.RADIUS))) || (ball.getYPos() <= 0)){
+			System.out.println("Top or bottom \'wall\' was hit");
 			playSound(wall_hit); //do this regardless of whether the game is over or not
-		}else if (ball.getXPos() == WINDOW_WIDTH - (4 * Ball.RADIUS) || ball.getXPos() == 0){ //don't want both behaviors at once
+		}else if (ball.getXPos() == (WINDOW_WIDTH - (4 * Ball.RADIUS)) || ball.getXPos() == 0){ //don't want both behaviors at once
 			if (gameOver){
 				playSound(wall_hit);
 			}else{

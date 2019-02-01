@@ -1,3 +1,5 @@
+package pong;
+
 public class Ball {
 	public static final int RADIUS = 10; //size of the Ball
 
@@ -60,9 +62,7 @@ public class Ball {
 		return this.yPos;
 	}
 	
-	/*For swapping directions:
-	would actually prefer for setting velocity to be more encapsulated
-	and controlled by the Ball class*/
+	//for swapping directions
 	public void reverseXVelocity(){
 		xVelocity = -xVelocity;
 	}

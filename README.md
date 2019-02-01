@@ -16,14 +16,14 @@ Download the Java Development Kit (JDK). Versions 7 and above would be suitable.
 ### Downloading and Running the Source Code
 
 1. Fork and clone the java-pong repository.
-2. Navigate to the cloned repository's `java` directory and run the following command to compile the project’s java files. 
+2. Navigate to the cloned repository's `java` directory with the command `cd java` and run the following command to compile all of the project’s java files. 
 
 ~~~
-javac *.java
+javac player/*.java pong/*.java
 ~~~
 3. Run the game using:
 ~~~
-java Game
+java pong.Game
 ~~~
 
 ## Bugs and support
