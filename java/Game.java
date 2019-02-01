@@ -94,7 +94,7 @@ public class Game extends JFrame implements Runnable {
 		//set the game start running
 		Thread gameThread = new Thread(this);
 		try{
-	        //waits for this current thread to die before beginning execution		
+			//waits for this current thread to die before beginning execution
 			gameThread.join();
 		//most exceptions are contained in java.lang
 		}catch(InterruptedException ex){
@@ -110,11 +110,11 @@ public class Game extends JFrame implements Runnable {
 		try {
 			AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File(sound));
 			//System.out.println("input stream reference is: " + inputStream);
-           	AudioFormat format = inputStream.getFormat();
-            DataLine.Info info = new DataLine.Info(Clip.class, format);
+			AudioFormat format = inputStream.getFormat();
+			DataLine.Info info = new DataLine.Info(Clip.class, format);
 			Clip clip = (Clip)AudioSystem.getLine(info);
-            clip.open(inputStream);
-            clip.start();
+			clip.open(inputStream);
+			clip.start();
 		//if the audio clips compete for resources
 		}catch(LineUnavailableException ex){
 			System.out.println("Audio competed for resources.");
@@ -210,37 +210,36 @@ public class Game extends JFrame implements Runnable {
 
     //This method contains the AI for the other paddle
     public void doplayer2Behavior() {
-		/*progressively improves the AI based on the player's score*/
-		if (player2.getXPos() - ball.getXPos() < 50 + ((left_score + right_score) * 10)) { 
-			if (ball.getYPos() > player2.getYPos()) {
-				// System.out.println("AI UP");
-				player2.moveDown();
-			} else if (ball.getYPos() < player2.getYPos()) {
-				// System.out.println("AI DOWN");
-				player2.moveUp();
-			} else if (ball.getYPos() == player2.getYPos()) {
-				// System.out.println("AI STOP");
-				player2.stop();
-			}
-		/*Do either up or down movement every few seconds or so if not within the AI paddle's current range*/
-		}else{
-			behavior_time++;
-			if (behavior_time > 100){
-			   behavior_time = 0;
-			   //will either generate a 0, 1, or 2
-			   int choice = random_generator.nextInt(3);
-			   //System.out.println(choice);
-			   switch(choice){
-				   case 0: player2.moveDown(); break;
-				   case 1: player2.moveUp(); break;
-				   default: //else do nothing for now
-			   }
-		    }//end if behavior time
-			//System.out.println(behavior_time);
-		}//end else	
+		  /*progressively improves the AI based on the player's score*/
+      if (player2.getXPos() - ball.getXPos() < 50 + ((left_score + right_score) * 10)) { 
+        if (ball.getYPos() > player2.getYPos()) {
+          // System.out.println("AI UP");
+          player2.moveDown();
+        } else if (ball.getYPos() < player2.getYPos()) {
+          // System.out.println("AI DOWN");
+          player2.moveUp();
+        } else if (ball.getYPos() == player2.getYPos()) {
+          // System.out.println("AI STOP");
+          player2.stop();
+        }
+      }else{
+        behavior_time++;
+        if (behavior_time > 100){
+           behavior_time = 0;
+           //will either generate a 0, 1, or 2
+           int choice = random_generator.nextInt(3);
+           //System.out.println(choice);
+           switch(choice){
+             case 0: player2.moveDown(); break;
+             case 1: player2.moveUp(); break;
+             default: //else do nothing for now
+           }
+          }//end if behavior time
+        //System.out.println(behavior_time);
+      }//end else	
 	  }//end function
-	  
-	//for playing the wall sounds and incrementing score
+
+	//for playing the wall sounds
 	public void checkWallBounce(){
 		if ((ball.getYPos() >= WINDOW_HEIGHT - (6 * Ball.RADIUS)) || (ball.getYPos() <= 0)){
 			playSound(wall_hit); //do this regardless of whether the game is over or not
@@ -253,7 +252,7 @@ public class Game extends JFrame implements Runnable {
 		}
 	}
 
-    //Check for the moment where the paddles and the ball collide and play paddle hit sounds
+	//Check for the moment where the paddles and the ball collide
 	public void doCollision(){
 		//left paddle collision
 		for (int colY =  player1.getYPos(); colY <  player1.getYPos() + Paddle.HEIGHT; colY++){
@@ -276,8 +275,8 @@ public class Game extends JFrame implements Runnable {
 		}
 	}
 
-        /*checks whether or not either of the paddles have scored 7 points -- if they have
-        /then destroy the paddles and restart the game.*/
+	/*checks whether or not either of the paddles have scored 7 points -- if they have
+	/then destroy the paddles and restart the game.*/
 	public void gameOver(){
 		if((left_score >= 7 || right_score >= 7) &&  gameOver == false){
 			gameOver = true;
