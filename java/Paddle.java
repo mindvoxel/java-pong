@@ -41,12 +41,12 @@ public class Paddle {
 	}
 	
 	//getter
-	public int getxPos() {
+	public int getXPos() {
 		return xPos;
 	}
 	
 	//getter
-	public int getyPos() {
+	public int getYPos() {
 		return yPos;
 	}
 

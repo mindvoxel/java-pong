@@ -54,8 +54,6 @@ public class Game extends JFrame implements Runnable {
 		//Startup stuff
 		initSound();
 	    initCanvas();
-		//set up the double buffer
-		backBuffer = new BufferedImage(WINDOW_HEIGHT, WINDOW_WIDTH, BufferedImage.TYPE_INT_RGB);
 		//register input to the jFrame, which is polled
 	    gameInput = new Input(this); 
 		//start the game
@@ -162,7 +160,6 @@ public class Game extends JFrame implements Runnable {
 			} else{ //Game Over, man! 
 				ball.updateBall();
 				checkWallBounce();
-				gameOver();
 				repaint();
 			}
 		} //end while
@@ -213,58 +210,44 @@ public class Game extends JFrame implements Runnable {
 
     //This method contains the AI for the other paddle
     public void doplayer2Behavior() {
-		//System.out.println("ball y: " + ball.getyPos() + " paddle y: " + player2.getyPos());
-		/*progressively improves the AI based on the player's score*/
-		if (player2.getxPos() - ball.getxPos() < 50 + ((left_score + right_score) * 10)) { 
-			if (ball.getyPos() > player2.getyPos()) {
-				// System.out.println("AI UP");
-				player2.moveDown();
-			} else if (ball.getyPos() < player2.getyPos()) {
-				// System.out.println("AI DOWN");
-				player2.moveUp();
-			} else if (ball.getyPos() == player2.getyPos()) {
-				// System.out.println("AI STOP");
-				player2.stop();
-			}
-		/*Do either up or down movement every few seconds or so if not within the AI paddle's current range*/
-		}else{
-			behavior_time += 1;
-			if (behavior_time > 100){
-				behavior_time = 0;
-				int choice = random_generator.nextInt(3);
-				//will either generate a 0 or a 1
-				if (choice == 1){
-					player2.moveDown();
-				}else if (choice == 0){
-					player2.moveUp();
-				}else{
-					//else do nothing
-				}
-				//System.out.println(choice);
-			}
-			//System.out.println(behavior_time);
-		}
-	}
+		  /*progressively improves the AI based on the player's score*/
+      if (player2.getXPos() - ball.getXPos() < 50 + ((left_score + right_score) * 10)) { 
+        if (ball.getYPos() > player2.getYPos()) {
+          // System.out.println("AI UP");
+          player2.moveDown();
+        } else if (ball.getYPos() < player2.getYPos()) {
+          // System.out.println("AI DOWN");
+          player2.moveUp();
+        } else if (ball.getYPos() == player2.getYPos()) {
+          // System.out.println("AI STOP");
+          player2.stop();
+        }
+      }else{
+        behavior_time++;
+        if (behavior_time > 100){
+           behavior_time = 0;
+           //will either generate a 0, 1, or 2
+           int choice = random_generator.nextInt(3);
+           //System.out.println(choice);
+           switch(choice){
+             case 0: player2.moveDown(); break;
+             case 1: player2.moveUp(); break;
+             default: //else do nothing for now
+           }
+          }//end if behavior time
+        //System.out.println(behavior_time);
+      }//end else	
+	  }//end function
+
 	//for playing the wall sounds
 	public void checkWallBounce(){
-		if (ball.getyPos() > WINDOW_HEIGHT - (6 * Ball.RADIUS)){
-			playSound(wall_hit);
-		}
-		if (ball.getyPos() < 0){
-			playSound(wall_hit);
-		}
-
-		if (ball.getxPos() == WINDOW_WIDTH -(4 * Ball.RADIUS)){
-			playSound(wall_hit);
-			if (gameOver == false){
-				left_score++;
-			}
-		}
-
-		if (ball.getxPos() == 0){
-			playSound(wall_hit);
-			if (gameOver == false){
-				right_score++;
+		if ((ball.getYPos() >= WINDOW_HEIGHT - (6 * Ball.RADIUS)) || (ball.getYPos() <= 0)){
+			playSound(wall_hit); //do this regardless of whether the game is over or not
+		}else if (ball.getXPos() == WINDOW_WIDTH - (4 * Ball.RADIUS) || ball.getXPos() == 0){ //don't want both behaviors at once
+			if (gameOver){
+				playSound(wall_hit);
+			}else{
+				playSound(miss); //only play out-of-bounds x misses if there is a game in progress
 			}
 		}
 	}
@@ -272,8 +255,8 @@ public class Game extends JFrame implements Runnable {
 	//Check for the moment where the paddles and the ball collide
 	public void doCollision(){
 		//left paddle collision
-		for (int colY =  player1.getyPos(); colY <  player1.getyPos() + Paddle.HEIGHT; colY++){
-			if (  ball.getxPos() ==  player1.getxPos() &&   ball.getyPos() + Ball.RADIUS == colY){
+		for (int colY =  player1.getYPos(); colY <  player1.getYPos() + Paddle.HEIGHT; colY++){
+			if (  ball.getXPos() ==  player1.getXPos() &&   ball.getYPos() + Ball.RADIUS == colY){
 				ball.reverseXVelocity();
 				playSound(paddle_hit);
 				ball.setYVelocity(player1.getVelocity());
@@ -282,8 +265,8 @@ public class Game extends JFrame implements Runnable {
 		}
 
 		//right paddle collision
-		for (int colY =  player2.getyPos(); colY <  player2.getyPos() + Paddle.HEIGHT; colY++){
-			if (ball.getxPos() ==  player2.getxPos() - Paddle.WIDTH &&  ball.getyPos() + Ball.RADIUS == colY){
+		for (int colY =  player2.getYPos(); colY <  player2.getYPos() + Paddle.HEIGHT; colY++){
+			if (ball.getXPos() ==  player2.getXPos() - Paddle.WIDTH &&  ball.getYPos() + Ball.RADIUS == colY){
 				ball.reverseXVelocity();
 				playSound(paddle_hit);
 				//System.out.println("COLLISION");
@@ -304,11 +287,6 @@ public class Game extends JFrame implements Runnable {
 	//Nested class
 	private class Canvas extends JPanel{
 
-		/*Seems terrible that this method has to draw everything twice,
-		once to the back-buffer, and once to the front-buffer. This should be
-		resolved by calling this method twice, once with front buffer and once with
-		the back-buffer (perhaps as method arguments) But the problem with this is that
-		the paint method is overriden and needs to have only Graphics as a parameter*/
 		public void paint(Graphics g){
 			//weird swing graphics housekeeping
 			Graphics2D g2 = (Graphics2D) g;
@@ -317,18 +295,23 @@ public class Game extends JFrame implements Runnable {
 			g2.setColor(Color.BLACK);
 			g2.fillRect(0, 0, WINDOW_HEIGHT, WINDOW_WIDTH); // fill the whole screen black
 			g2.setColor(Color.WHITE);
-			if (gameOver == false){
-				g2.fillRect( player1.getxPos(),  player1.getyPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw player paddle
-				g2.fillRect( player2.getxPos(),  player2.getyPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw computer paddle
+
+			//only draw the paddles when there is still a game in progress, and don't attempt to draw paddles when they are null
+			if (gameOver == false && player1 != null && player2 != null){
+				g2.fillRect( player1.getXPos(),  player1.getYPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw player paddle
+				g2.fillRect( player2.getXPos(),  player2.getYPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw computer paddle
 			}
+
 			synchronized (ball_mutex) { // Wait until nothing else is creating/deleting the ball
 				if (ball != null) {
-					g2.fillOval(ball.getxPos(), ball.getyPos(), Ball.RADIUS * 2, Ball.RADIUS * 2);
+					g2.fillOval(ball.getXPos(), ball.getYPos(), Ball.RADIUS * 2, Ball.RADIUS * 2);
 				}
 			}
+
 			for (int i =0; i < WINDOW_WIDTH; i+=10){ //dotted line
 				g2.drawLine(WINDOW_WIDTH/2,i,WINDOW_WIDTH/2,i +5);
 			}
+
 			g2.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 72));
 			g2.drawString("" + left_score, WINDOW_WIDTH/2 -150, 100);
 			g2.drawString("" + right_score, WINDOW_WIDTH/2 + 100, 100);
