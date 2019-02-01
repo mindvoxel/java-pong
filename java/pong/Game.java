@@ -39,7 +39,7 @@ public class Game extends JFrame implements Runnable {
 	private Object ball_mutex = new Object(); // ensure concurrency is handled correctly
 	private Random random_generator; //for generating random integers
 	private Input gameInput; //instance variable for handling input
-	private boolean gameOver = false;
+	private boolean gameOver = true;
 
 	//each string is a path to an audio resource
 	private String miss;
@@ -314,6 +314,9 @@ public class Game extends JFrame implements Runnable {
 			if (gameOver == false && player1 != null && player2 != null){
 				g2.fillRect( player1.getXPos(),  player1.getYPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw player paddle
 				g2.fillRect( player2.getXPos(),  player2.getYPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw computer paddle
+			}else{
+				g2.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
+				g2.drawString("Press the 'enter' key to start a new game.", 55, WINDOW_HEIGHT - 100);
 			}
 
 			synchronized (ball_mutex) { // Wait until nothing else is creating/deleting the ball
