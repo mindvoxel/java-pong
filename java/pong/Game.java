@@ -20,8 +20,10 @@ public class Game extends JFrame implements Runnable {
 
 	//static vars, placed here instead of Paddle because scores don't necessarily belong to a paddle; didn't want extra bloat code 
 	//for score getter, setter, incrementation, etc.
-	public static int leftScore = 0;
-	public static int rightScore = 0;
+	protected static int leftScore = 0;
+	protected static int rightScore = 0;
+
+	private static int behavior_time = 0;
 
 	//instance variables
 	private Paddle player1; //player paddle
@@ -31,7 +33,6 @@ public class Game extends JFrame implements Runnable {
 	private boolean gameOver = true;
 
 	private Input input; //instance variable for handling input
-	private SoundHandler soundHandler;
 
 	//locks for concurrency
 	private Object ballLock = new Object(); 
@@ -65,7 +66,6 @@ public class Game extends JFrame implements Runnable {
 		 this.paddleHit = "../sounds/paddle_hit.wav";
 		 this.wallHit = "../sounds/wall_hit.wav";
 		 //create a new sound Handler object
-		soundHandler = new SoundHandler();
 	}
 
 	//Set up Canvas which is a child of Component and add it to (this) JFrame
@@ -121,7 +121,7 @@ public class Game extends JFrame implements Runnable {
 		/*Game loop should always be running*/
 		while (true){
 			updateInput(); //Also includes check for reset (enter) in case of gameOver mode
-			System.out.println(Thread.activeCount());//print the number of threads currently running
+			//System.out.println(Thread.activeCount());//print the number of threads currently running
 			try{
 		        Thread.sleep(5);//tells the game how often to refresh
 			}catch (Exception ex){
@@ -171,7 +171,7 @@ public class Game extends JFrame implements Runnable {
 	/either of the paddles*/
 	public void destroyBall(){
 		if (ball.isDestroyable()){
-			soundHandler.playSound(miss);
+			SoundHandler.playSound(miss);
 			synchronized (ballLock) { // We will delete the ball - make sure it doesn't get painted at the same time
 				ball = null;
 			}
@@ -191,7 +191,7 @@ public class Game extends JFrame implements Runnable {
 
     //This method contains the AI for the other paddle. Behavior time may be different depending on platoform.
     public void doplayer2Behavior() {
-		double behavior_time = 0; 
+		behavior_time++;
 		  //progressively improves the AI based on total score
       if (player2.getXPos() - ball.getXPos() < 50 + ((leftScore + rightScore) * 10)) { 
         if (ball.getYPos() > player2.getYPos()) {
@@ -205,8 +205,7 @@ public class Game extends JFrame implements Runnable {
           player2.stop();
         }
       }else{
-        behavior_time++;
-        if (behavior_time > 100){
+        if (behavior_time > 50){
            behavior_time = 0;
            //will either generate a 0, 1, or 2
            int choice = random.nextInt(3);
@@ -214,7 +213,6 @@ public class Game extends JFrame implements Runnable {
            switch(choice){
              case 0: player2.moveDown(); break;
              case 1: player2.moveUp(); break;
-             default: //else do nothing for now
            }
           }//end if behavior time
         //System.out.println(behavior_time);
@@ -225,19 +223,19 @@ public class Game extends JFrame implements Runnable {
 	public void checkWallBounce(){
 		if ((ball.getYPos() >= (WINDOW_HEIGHT - (6 * Ball.RADIUS))) || (ball.getYPos() <= 0)){
 			//System.out.println("Top or bottom \'wall\' was hit");
-			soundHandler.playSound(wallHit); //do this regardless of whether the game is over or not
+			SoundHandler.playSound(wallHit); //do this regardless of whether the game is over or not
 		}else if (ball.getXPos() == (WINDOW_WIDTH - (4 * Ball.RADIUS))){ 
 			if (gameOver){
-				soundHandler.playSound(wallHit);
+				SoundHandler.playSound(wallHit);
 			}else{
-				soundHandler.playSound(miss); //only play out-of-bounds x misses if there is a game in progress
+				SoundHandler.playSound(miss); //only play out-of-bounds x misses if there is a game in progress
 				leftScore++;
 			}
 		}else if(ball.getXPos() == 0){
 			if (gameOver){
-				soundHandler.playSound(wallHit);
+				SoundHandler.playSound(wallHit);
 			}else{
-				soundHandler.playSound(miss); 
+				SoundHandler.playSound(miss); 
 				rightScore++;
 			}
 		}
@@ -249,7 +247,7 @@ public class Game extends JFrame implements Runnable {
 		for (int colY =  player1.getYPos(); colY <  player1.getYPos() + Paddle.HEIGHT; colY++){
 			if (  ball.getXPos() ==  player1.getXPos() &&   ball.getYPos() + Ball.RADIUS == colY){
 				ball.reverseXVelocity();
-				soundHandler.playSound(paddleHit);
+				SoundHandler.playSound(paddleHit);
 				ball.setYVelocity(player1.getVelocity());
 				//System.out.println("COLLISION");
 			}
@@ -259,7 +257,7 @@ public class Game extends JFrame implements Runnable {
 		for (int colY =  player2.getYPos(); colY <  player2.getYPos() + Paddle.HEIGHT; colY++){
 			if (ball.getXPos() ==  player2.getXPos() - Paddle.WIDTH &&  ball.getYPos() + Ball.RADIUS == colY){
 				ball.reverseXVelocity();
-				soundHandler.playSound(paddleHit);
+				SoundHandler.playSound(paddleHit);
 				//System.out.println("COLLISION");
 				ball.setYVelocity(player1.getVelocity());
 			}
