@@ -26,8 +26,10 @@ javac player/*.java pong/*.java sound/*.java
 ~~~
 java pong.Game
 ~~~
+4. You can view the view the performance of java-pong with the command `jconsole <pid of pong.Game on your computer here>`. The goal is to minimize the number of threads while maximizing performance! 
 
 ## Bugs and support
 * To report bugs and request features, please use the GitHub issue tracker at:
 <br /> https://github.com/chris-wolff/java-pong/issues
 * For more information on contributing, see the [contributing guide](https://github.com/chris-wolff/java-pong/blob/master/CONTRIBUTING.md)
+

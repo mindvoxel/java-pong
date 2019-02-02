@@ -54,7 +54,7 @@ public class Game extends JFrame implements Runnable {
 		//Startup stuff
 		initSound();
 	    initCanvas();
-		//register input to the jFrame, which is polled
+		//register input to the jFrame, which is polled (in a seperate thread?)
 	    input = new Input(this); 
 		//start the game
 		startGameThread();
@@ -126,6 +126,7 @@ public class Game extends JFrame implements Runnable {
 		        Thread.sleep(5);//tells the game how often to refresh
 			}catch (Exception ex){
 				System.out.println("Couldn't sleep for some reason.");	
+				ex.printStackTrace();
 			}
 			if (gameOver == false){
 				doplayer2Behavior(); //ai
@@ -136,7 +137,7 @@ public class Game extends JFrame implements Runnable {
 				doCollision(); //checks for collisions between padles and ball
 				checkWallBounce(); //for playing the wall sounds
 				gameOver();
-				repaint(); // repaint component (draw event in gamemaker)
+				repaint(); //repaint component (draw event in gamemaker), paintImmediately() is blocking (stops execution of other Threadss)
 
 			} else{ //Game Over, man! 
 				ball.updateBall();
@@ -162,8 +163,8 @@ public class Game extends JFrame implements Runnable {
 			leftScore = 0;
 			rightScore = 0;
 			gameOver = false;
-			player1 = new Paddle(25, WINDOW_HEIGHT / 2);
-			player2 = new Paddle(WINDOW_WIDTH - 50, WINDOW_HEIGHT /2);
+			synchronized (player1Lock) {player1 = new Paddle(25, WINDOW_HEIGHT / 2);}
+			synchronized (player2Lock) {player2 = new Paddle(WINDOW_WIDTH - 50, WINDOW_HEIGHT /2);}
 		}
 	}
 
@@ -172,20 +173,15 @@ public class Game extends JFrame implements Runnable {
 	public void destroyBall(){
 		if (ball.isDestroyable()){
 			SoundHandler.playSound(miss);
-			synchronized (ballLock) { // We will delete the ball - make sure it doesn't get painted at the same time
-				ball = null;
-			}
+			synchronized (ballLock) {ball = null;}//make sure does not get painted at same time 
 			/*creates the ball in the middle of the screen*/
 			int ball_rand = random.nextInt(120); 
 			/*a ball_rand of 0 will create a ball that bounces vertically, forever */ 
 			while (ball_rand == 0){
 			      ball_rand = random.nextInt(120);
 			}
-
 			//System.out.println("ball seed " + ball_rand);
-			synchronized (ballLock) { // We will create the ball - make sure it doesn't get painted at the same time
-				ball = new Ball(WINDOW_WIDTH / 2, ball_rand + 120, (ball_rand + 120) * (Math.PI / 180));
-			}
+			synchronized (ballLock) {ball = new Ball(WINDOW_WIDTH / 2, ball_rand + 120, (ball_rand + 120) * (Math.PI / 180));}
 		}
 	}
 
@@ -269,13 +265,14 @@ public class Game extends JFrame implements Runnable {
 	public void gameOver(){
 		if((leftScore >= 7 || rightScore >= 7) &&  gameOver == false){
 			gameOver = true;
-			player1 = null;
-			player2 = null;
+			synchronized(player1Lock){player1 = null;}
+			synchronized(player2Lock){player2 = null;}	
 		}
 	}
 	//Nested class
 	private class Canvas extends JPanel{
 
+		//This method runs in a seperate thread. Does not change state of Game data, only reads
 		public void paint(Graphics g){
 			//weird swing graphics housekeeping
 			Graphics2D g2 = (Graphics2D) g;
@@ -286,12 +283,16 @@ public class Game extends JFrame implements Runnable {
 			g2.setColor(Color.WHITE);
 
 			//only draw the paddles when there is still a game in progress, and don't attempt to draw paddles when they are null
-			if (gameOver == false && player1 != null && player2 != null){
-				synchronized(player1Lock){
-					g2.fillRect( player1.getXPos(),  player1.getYPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw player paddle
+			if (gameOver == false){
+				synchronized(player1Lock){ //wait until aquired lock from new game thread which has power to create and destroy the ball
+					if (player1 != null){
+						g2.fillRect( player1.getXPos(),  player1.getYPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw player paddle
+					}
 				}
 				synchronized(player2Lock){
-					g2.fillRect( player2.getXPos(),  player2.getYPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw computer paddle
+					if (player2 !=null){
+						g2.fillRect( player2.getXPos(),  player2.getYPos(), Paddle.WIDTH, Paddle.HEIGHT); // draw computer paddle
+					}
 				}	
 			}else{
 				g2.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
