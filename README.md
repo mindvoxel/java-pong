@@ -18,7 +18,7 @@ Download the Java Development Kit (JDK). Versions 7 and above would be suitable.
 1. Fork and clone the java-pong repository.
 2. Navigate to the cloned repository's `java` directory with the command `cd java` and run 
 ~~~
-javac player/*.java pong/*.java
+javac player/*.java pong/*.java sound/*.java
 ~~~
    to compile all of the project’s java files. 
 

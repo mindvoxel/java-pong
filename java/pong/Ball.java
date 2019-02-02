@@ -6,7 +6,7 @@ public class Ball {
 	private int directionVector = 2;
 	private int xVelocity, yVelocity, xPos, yPos;
 	private double angle;
-	private boolean destroyable;
+	private boolean destroyable; //is this field neccessary? 
 		
 	public Ball(int xPos, int yPos, double angle){
 		//in case a crazy person tries to create a Ball with values outside of the Game screen
@@ -27,7 +27,7 @@ public class Ball {
 		xVelocity = (int)(Math.cos(angle) * (double) directionVector);
 		yVelocity = (int)(Math.sin(angle) * (double) directionVector);
 		destroyable = false;
-		System.out.println(angle);
+		//System.out.println(angle);
 	}
 	//update position
 	public void updateBall(){
