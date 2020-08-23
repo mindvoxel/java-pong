@@ -23,7 +23,12 @@ public class Paddle {
 	//update the position of the paddles
 	public void update(){
 		//update the yPos
-		yPos +=velocity;
+		yPos += velocity;
+		
+		//decay the velocity to zero
+		if (velocity != 0) {
+			velocity = velocity - (velocity / java.lang.Math.abs(velocity));
+		}
 		
 		//top of the screen
 		if (yPos < 0){

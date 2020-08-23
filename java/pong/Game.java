@@ -3,7 +3,7 @@ package pong;
 import javax.swing.*; //window
 import java.awt.*; //painting graphics and images
 import java.util.Random; //random number generator
-import java.awt.image.BufferedImage; //for double buffering, swing isn't great for animations
+import java.io.File;
 import java.awt.event.KeyEvent; //includes all of the constants used for input
 
 import player.Input;
@@ -18,12 +18,10 @@ public class Game extends JFrame implements Runnable {
 	protected static final int WINDOW_HEIGHT = 450; // the height of the game window
 	protected static final int WINDOW_WIDTH = 450; // the width of the game window
 
-	//static vars, placed here instead of Paddle because scores don't necessarily belong to a paddle; didn't want extra bloat code 
-	//for score getter, setter, incrementation, etc.
-	protected static int leftScore = 0;
-	protected static int rightScore = 0;
-
-	private static int behavior_time = 0;
+	//scores placed here instead of Paddle because scores don't necessarily belong to a paddle; 
+	//didn't want extra bloat code 
+	protected int leftScore = 0;
+	protected int rightScore = 0;
 
 	//instance variables
 	private Paddle player1; //player paddle
@@ -54,17 +52,18 @@ public class Game extends JFrame implements Runnable {
 		//Startup stuff
 		initSound();
 	    initCanvas();
-		//register input to the jFrame, which is polled (in a seperate thread?)
+		//register input to the jFrame, which is polled (in a separate thread?)
 	    input = new Input(this); 
 		//start the game
 		startGameThread();
-	} //end constructor, game init.
+	} //end constructor, game initialization.
 
 	/*set up sound strings*/
 	public void initSound(){
-		 this.miss = "../sounds/miss.wav";
-		 this.paddleHit = "../sounds/paddle_hit.wav";
-		 this.wallHit = "../sounds/wall_hit.wav";
+		//Use OS independent path manipulators so that it works on all platforms
+		 this.miss = System.getProperty("user.dir") + File.separator + "sounds/miss.wav";
+		 this.paddleHit = System.getProperty("user.dir") + File.separator + "sounds/paddle_hit.wav";
+		 this.wallHit = System.getProperty("user.dir") + File.separator + "sounds/wall_hit.wav";
 		 //create a new sound Handler object
 	}
 
@@ -79,10 +78,15 @@ public class Game extends JFrame implements Runnable {
 		setVisible(true);
 		setSize(WINDOW_HEIGHT, WINDOW_WIDTH);
 		setVisible(true);
-
-		//if the window is not resizeable the window does not open on certain linux machines
+	
+		//if the window is not resize-able the window does not open on certain Linux machines
 		setResizable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		//https://stackoverflow.com/questions/2442599/how-to-set-jframe-to-appear-centered-regardless-of-monitor-resolution
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+		
 		add(myCanvas);
 		
 		//request focus so the JFrame is getting the input, for sure
@@ -119,11 +123,17 @@ public class Game extends JFrame implements Runnable {
 		}
 		
 		/*Game loop should always be running*/
+		boolean wallBounce = false;
 		while (true){
 			updateInput(); //Also includes check for reset (enter) in case of gameOver mode
 			//System.out.println(Thread.activeCount());//print the number of threads currently running
 			try{
-		        Thread.sleep(5);//tells the game how often to refresh
+				int delayMs = 3;
+				if (wallBounce)
+				{
+					delayMs = 750;//delay when a score happens so you can see where it's going to go
+				}
+		        Thread.sleep(delayMs);//tells the game how often to refresh
 			}catch (Exception ex){
 				System.out.println("Couldn't sleep for some reason.");	
 				ex.printStackTrace();
@@ -134,10 +144,10 @@ public class Game extends JFrame implements Runnable {
 				player2.update(); //update other paddle
 				ball.updateBall(); //update the ball object
 				destroyBall(); //point ball to null if it goes behind paddle (and creates a new one)
-				doCollision(); //checks for collisions between padles and ball
-				checkWallBounce(); //for playing the wall sounds
+				doCollision(); //checks for collisions between paddles and ball
+				wallBounce = checkWallBounce(); //for playing the wall sounds
 				gameOver();
-				repaint(); //repaint component (draw event in gamemaker), paintImmediately() is blocking (stops execution of other Threadss)
+				repaint(); //repaint component (draw event in game maker), paintImmediately() is blocking (stops execution of other Threads)
 
 			} else{ //Game Over, man! 
 				ball.updateBall();
@@ -181,15 +191,15 @@ public class Game extends JFrame implements Runnable {
 			      ball_rand = random.nextInt(120);
 			}
 			//System.out.println("ball seed " + ball_rand);
-			synchronized (ballLock) {ball = new Ball(WINDOW_WIDTH / 2, ball_rand + 120, (ball_rand + 120) * (Math.PI / 180));}
+			//don't put the ball in the middle, it's impossible to react to in time.  Put it closer to the edge of the screen.
+			synchronized (ballLock) {ball = new Ball((int)(WINDOW_WIDTH * 0.85), ball_rand + 120, (ball_rand + 120) * (Math.PI / 180));}
 		}
 	}
 
-    //This method contains the AI for the other paddle. Behavior time may be different depending on platoform.
+    //This method contains the AI for the other paddle. Behavior time may be different depending on platform.
     public void doplayer2Behavior() {
-		behavior_time++;
-		  //progressively improves the AI based on total score
-      if (player2.getXPos() - ball.getXPos() < 50 + ((leftScore + rightScore) * 10)) { 
+		  //progressively improves the AI based on how close you are to winning
+      if ((player2.getXPos() - ball.getXPos()) < (leftScore * 10)) { 
         if (ball.getYPos() > player2.getYPos()) {
           // System.out.println("AI UP");
           player2.moveDown();
@@ -201,8 +211,6 @@ public class Game extends JFrame implements Runnable {
           player2.stop();
         }
       }else{
-        if (behavior_time > 50){
-           behavior_time = 0;
            //will either generate a 0, 1, or 2
            int choice = random.nextInt(3);
            //System.out.println(choice);
@@ -210,13 +218,11 @@ public class Game extends JFrame implements Runnable {
              case 0: player2.moveDown(); break;
              case 1: player2.moveUp(); break;
            }
-          }//end if behavior time
-        //System.out.println(behavior_time);
       }//end else	
 	  }//end function
 
 	//for playing the wall sounds, else-if because don't want any sounds to play or wall collision behavior to happen simultaneously
-	public void checkWallBounce(){
+	public boolean checkWallBounce(){
 		if ((ball.getYPos() >= (WINDOW_HEIGHT - (6 * Ball.RADIUS))) || (ball.getYPos() <= 0)){
 			//System.out.println("Top or bottom \'wall\' was hit");
 			SoundHandler.playSound(wallHit); //do this regardless of whether the game is over or not
@@ -226,6 +232,7 @@ public class Game extends JFrame implements Runnable {
 			}else{
 				SoundHandler.playSound(miss); //only play out-of-bounds x misses if there is a game in progress
 				leftScore++;
+				return true;
 			}
 		}else if(ball.getXPos() == 0){
 			if (gameOver){
@@ -233,8 +240,11 @@ public class Game extends JFrame implements Runnable {
 			}else{
 				SoundHandler.playSound(miss); 
 				rightScore++;
+				return true;
 			}
 		}
+		
+		return false;
 	}
 
 	//Check for the moment where the paddles and the ball collide
@@ -272,7 +282,7 @@ public class Game extends JFrame implements Runnable {
 	//Nested class
 	private class Canvas extends JPanel{
 
-		//This method runs in a seperate thread. Does not change state of Game data, only reads
+		//This method runs in a separate thread. Does not change state of Game data, only reads
 		public void paint(Graphics g){
 			//weird swing graphics housekeeping
 			Graphics2D g2 = (Graphics2D) g;
