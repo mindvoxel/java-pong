@@ -5,3 +5,5 @@
 # Ignore VS Code Java Extension stuff (Ignore IDE)
 .vscode
 launch.json
+/bin/
+/bin1/
