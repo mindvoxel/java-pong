@@ -61,9 +61,9 @@ public class Game extends JFrame implements Runnable {
 	/*set up sound strings*/
 	public void initSound(){
 		//Use OS independent path manipulators so that it works on all platforms
-		 this.miss = System.getProperty("user.dir") + File.separator + "sounds/miss.wav";
-		 this.paddleHit = System.getProperty("user.dir") + File.separator + "sounds/paddle_hit.wav";
-		 this.wallHit = System.getProperty("user.dir") + File.separator + "sounds/wall_hit.wav";
+		 this.miss = ".." + File.separator + "sounds" + File.separator + "miss.wav";
+		 this.paddleHit = ".." + File.separator + "sounds" + File.separator + "paddle_hit.wav";
+		 this.wallHit = ".." + File.separator + "sounds" + File.separator + "wall_hit.wav";
 		 //create a new sound Handler object
 	}
 
